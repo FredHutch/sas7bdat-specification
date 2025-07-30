@@ -40,9 +40,9 @@ The information below was deduced by examining the contents of many SAS7BDAT dat
 
 SAS7BDAT files consist of binary encoded data. Data files encoded in this format often have the extension '.sas7bdat'. The name 'SAS7BDAT' is not official, but is used throughout this document to refer to SAS database files formatted according to the descriptions below.
 
-There are significant differences in the SAS7BDAT format depending on the operating systems and computer hardware platforms (32bit vs. 64bit). See the section on `platform differences`_ for more details. The format described below is sufficient to read the entire collection of test files referenced in ``data/sas7bdat.sources.RData`` (i.e. files associated with 32bit and some 64bit builds of SAS for Microsoft Windows, and **u64** SAS versions).  This includes files created with COMPRESS=CHAR. The format described here is probably not sufficient to **write** SAS7BDAT format files, due to lingering uncertainties.
+There are significant differences in the SAS7BDAT format depending on the operating systems and computer hardware platforms (32bit vs. 64bit). See the section on `platform differences`_ for more details. The format described below is sufficient to read the entire collection of test files referenced in ``data/sas7bdat.sources.RData`` (i.e. files associated with 32bit and some 64bit builds of SAS for Microsoft Windows, and **u64** SAS versions).  This includes files created with COMPRESS=CHAR.
 
-The figure below illustrates the overall structure of the SAS7BDAT database. Each file consists of a header (length := HL bytes), followed by PC pages, each of length PL bytes (PC and PL are shorthand for 'page count' and 'page size' respectively, and are used to denote these quantities throughout this document).::
+The figure below illustrates the overall structure of the SAS7BDAT database. Each file consists of a header (length := HL bytes), followed by PC pages, each of length PL bytes (PC and PL are shorthand for 'page count' and 'page size' respectively, and are used to denote these quantities throughout this document)::
 
   ----------
   |   HL   |  header 
@@ -72,37 +72,65 @@ Header Offset Table
 offset		length	conf.	description
 ==============  ======  ======  ===============================================
 0		32	high	binary, `magic number`_ 
-32		1	high	binary, Alignment_: if (byte==x33) a2=4 else a2=0 .  **u64** is true if a2=4 (unix 64 bit format).
-33		2	low	*????????????*
+32		1	high	binary, Alignment_: if (byte==x33) a2=4 else a2=0.  **u64** is true if a2=4 (unix 64 bit format).
+33		1	low	*????????????*; binary, x22 has been observed on **u64**
+34		1	low	*????????????*; x00 has been observed on **u64**
 35		1	high	binary, Alignment_  if (byte==x33) a1=4 else a1=0
-36		1	low	*????????????*
+36		1	low	*????????????*; binary, x33 has been observed on **u64**
 37		1	high	int, endianness (x01-little [Intel] x00-big)
-38		1	low	*????????????*
+38		1	low	*????????????*; x02 has been observed on **u64**
 39		1	medium	ascii, OS type (1-UNIX or 2-WIN).  Does not affect format except for the OS strings.
-40		8	low	*????????????*
-48		8	low	*????????????*
+40		1	low	*????????????*; binary, x01 has been observed on **u64**
+41		1	low	*????????????*; binary, x00 has been observed on **u64**
+42		1	low	*????????????*; binary, x00 has been observed on **u64**
+43		1	low	*????????????*; binary, x00 has been observed on **u64**
+44		1	low	*????????????*; binary, x00 has been observed on **u64**
+45		1	low	*????????????*; binary, x00 has been observed on **u64**
+45		1	low	*????????????*; binary, x00 has been observed on **u64**
+46		1	low	*????????????*; binary, x00 has been observed on **u64**
+47		1	medium	int, `Character Encoding`_
+48		1	low	*????????????*; binary, x00 has been observed on **u64**
+49		1	low	*????????????*; binary, x00 has been observed on **u64**
+50		1	low	*????????????*; binary, x03 has been observed on **u64**
+51		1	low	*????????????*; binary, x01 has been observed on **u64**
+52		1	low	*????????????*; binary, x18 has been observed on **u64**
+53		1	low	*????????????*; binary, x1F has been observed on **u64**
+54		1	low	*????????????*; binary, x10 has been observed on **u64**
+55		1	low	*????????????*; binary, x11 has been observed on **u64**
 56		8	low	repeat of 32:32+8
-64		6	low	*????????????*
-70		2	low	int, `Character Encoding`_
-72		12	low	*????????????*
+64		1	low	*????????????*; binary, x01 has been observed on **u64**
+65		1	low	*????????????*; binary, x33 has been observed on **u64**
+66		1	low	*????????????*; binary, x01 has been observed on **u64**
+67		1	low	*????????????*; binary, x23 has been observed on **u64**
+68		1	low	*????????????*; binary, x33 has been observed on **u64**
+69		1	low	*????????????*; binary, x00 has been observed on **u64**
+70		1	medium	int, `Character Encoding`_
+71		1	medium	int, `Character Encoding`_
+72		1	low	*????????????*; binary, x00 has been observed on **u64**
+73		1	low	*????????????*; binary, x20 has been observed on **u64**
+74		1	low	*????????????*; binary, x03 has been observed on **u64**
+75		1	low	*????????????*; binary, x01 has been observed on **u64**
+76		8	low	*????????????*; binary, all x00
 84		8	high	ascii 'SAS FILE'
 92		64	high	ascii, dataset name
 156		8	medium	ascii, file type, e.g. ``'DATA    '``
-164		a1	medium	zero padding when a1=4 .  Aligns the double timestamps below on double word boundaries.
+164		a1	medium	zero padding when a1=4.  Aligns the double timestamps below on double word boundaries.
 164+a1		8	high	double, timestamp, date created, secs since 1/1/60 (for SAS version 8.x and higher)
 172+a1		8	high	double, timestamp, date modified, secs since 1/1/60 (for SAS version 8.x and higher)
-180+a1		16	low	*????????????*
+180+a1		8	low	*????????????*
+188+a1		8	low	*????????????*, repeat of of 180+a1:188+a1
 196+a1		4	high	int, length of SAS7BDAT header := HL 
 200+a1		4	high	int, page size := _`PL`
 204+a1		4+a2	high	int, page count := PC .  Length 4 or 8 (**u64**), henceforth denoted **4|8**
 208+a1+a2	8	low	*????????????*
-216+a1+a2	8	high	ascii, SAS release  (e.g. 9.0101M3 )
+216+a1+a2	8	high	ascii, SAS release  (e.g. 9.0101M3)
 224+a1+a2	16	high	ascii, host  (SAS server type, longest observed string has 9 bytes)
-240+a1+a2	16	high	ascii, OS version number (for UNIX, else null)
+240+a1+a2	16	high	ascii, OS version number (for UNIX, else spaces or 0 bytes)
 256+a1+a2	16	high	ascii, OS maker or version (SUN, IBM, sometimes WIN)
-272+a1+a2	16	high	ascii, OS name (for UNIX, else null)
-288+a1+a2	32	low	*????????????*
-320+a1+a2	4	low	int, page sequence signature? (value is close to the value at start of each Page Offset Table)
+272+a1+a2	16	high	ascii, OS name (for UNIX, else spaces or 0 bytes)
+288+a1+a2	16	low	*????????????*, may be related to encryption.  For unencrypted files, the first four bytes are the low four bytes of the creation date, followed by a different four byte value that is repeated three times.  The first four bytes may be a nonce.  The repeated portion may be a function of the nonce and the password.  In an unencrypted file, the first four bytes were once observed to ``x38 xC0 xC8 xD4``.  In that same file, the repeated portion was observed to be ``x74 x8E xA7 xB1``, repeated three times.
+304+a1+a2	16	low	*????????????*, observed all zero bytes.
+320+a1+a2	4	high	int, the initial `Page Sequence Number`_
 324+a1+a2	4	low	*????????????*
 328+a1+a2	8	medium	double, 3rd timestamp, sometimes zero
 336+a1+a2	%HL	medium	zeros
@@ -119,7 +147,7 @@ The 8 bytes beginning at offset 32 hold information which affects the offset of 
 The following table describes some of the possible polymorphisms for the 8 bytes at offset 32. The first field lists the name of the file where the sequence was found (see ``data/sas7bdat.sources.RData``), the second lists the eight byte values (hexadecimal), the third field shows bytes 216-239 in ASCII ('.' represents a non-ASCII character or '\0'), and the fourth field lists the SAS7BDAT sub-format.
 
 =========================== =================================== ============================ ======================
-filename                    bytes 32-39                         bytes 216-239                format
+filename                    bytes 32-39                         bytes 216-239                sub-format
 =========================== =================================== ============================ ======================
 ``compress_no.sas7bdat``    ``x22 x22 x00 x32 x22 x01 x02 x32`` ``9.0101M3NET_ASRV........`` Windows Intel
 ``compress_yes.sas7bdat``   ``x22 x22 x00 x32 x22 x01 x02 x32`` ``9.0101M3NET_ASRV........`` Windows Intel
@@ -152,12 +180,12 @@ hexadecimal  decimal  binary
 Alignment
 +++++++++
 
-In files generated by 64 bit builds of SAS, 'alignment' means that all data field offsets containing doubles or 8 byte ints should be a factor of 8 bytes. For files generated by 32 bit builds of SAS, the alignment is 4 bytes. Because `SAS7BDAT Packed Binary Data`_ may contain double precision values, it appears that all data rows are 64 bit aligned, regardless of whether the file was written with a 32 bit or 64 bit build of SAS. Alignment of data structures according to the platform word length (4 bytes for 32 bit, and 8 bytes for 64 bit architectures) facilitates efficient operations on data stored in memory. It also suggests that parts of SAS7BDAT data file format are platform dependent. One theory is that the SAS implementation utilizes a common C or C++ structure or class to reference data stored in memory. When compiled, these structures are aligned according to the word length of the target platform. Of course, when SAS was originally written, platform differences may not have been forseeable. Hence, these inconsistencies may not have been intentional.
+In files generated by 64 bit builds of SAS, 'alignment' means that all data field offsets containing doubles or 8 byte ints should be a multiple of 8 bytes. For files generated by 32 bit builds of SAS, the alignment is 4 bytes. Because `SAS7BDAT Packed Binary Data`_ may contain double precision values, it appears that all data rows are 64 bit aligned, regardless of whether the file was written with a 32 bit or 64 bit build of SAS. Alignment of data structures according to the platform word length (4 bytes for 32 bit, and 8 bytes for 64 bit architectures) facilitates efficient operations on data stored in memory. It also suggests that parts of SAS7BDAT data file format are platform dependent. One theory is that the SAS implementation utilizes a common C or C++ structure or class to reference data stored in memory. When compiled, these structures are aligned according to the word length of the target platform. Of course, when SAS was originally written, platform differences may not have been forseeable. Hence, these inconsistencies may not have been intentional.
 
 Magic Number
 ++++++++++++
 
-The SAS7BDAT magic number is the following 32 byte (hex) sequence.::
+The SAS7BDAT magic number is the following 32 byte (hex) sequence::
 
    x00 x00 x00 x00   x00 x00 x00 x00
    x00 x00 x00 x00   xc2 xea x81 x60
@@ -176,10 +204,10 @@ In addition, the anomalous file is associated with the SAS release "3.2TK". Inde
 Character Encoding
 ++++++++++++++++++
 
-The integer (one or two bytes) at header offset 70 (bytes) indicates the character encoding of string data. The table below lists the values that are known to occur and the associated character encoding. 
+A one byte integer at header offset 47, 70, and 71 indicates the character encoding of string data.  The different values may indicate different encodings of different sections of text.  The table below lists the values that are known to occur and the associated character encoding.
 
 ==============	==============	=============
-bytes 70-72	SAS name	iconv name
+Encoding byte	SAS name	iconv name
 ==============	==============	=============
 0		(Unspecified)	(Unspecified)
 20		utf-8		UTF-8
@@ -208,12 +236,68 @@ bytes 70-72	SAS name	iconv name
 
 When the encoding is unspecified, the file uses the encoding of the SAS session that produced it (usually Windows-1252).
 
+Page Sequence Number
+++++++++++++++++++++
+
+Following the header, the content of a SAS7BDAT file is chunked into pages of a constant size (PL_ bytes).  Each of these pages has a unique four-byte integer, which acts as a page sequence number.  Instead of starting at page 1 and incrementing from there, the page sequence numbers start at a seemingly random number and then "increment" in a well-defined but haphazard manner.  The exact way in which they increment is unknown.
+
+For example, if the initial page sequence number is xE2677F63, then it increments by going down by 1 four times, then up by 7 once (e.g., x63,x62,x61,x60, x67,x66,x65,x64, x6B,x6A,x69,x68, x6F,...).  If the initial page sequence number is xAB353E75, it increments by going up by 1 four times, then down by 7 % 16 (e.g., x75,x76,x77, x70,x71,x72,x73, x7C,x7D,x7E,x7F, x78,...).  For an initial sequence number of x3664FB5A, the value increments by going up by 1, then down by 4 (e.g., x5A,x5B, x58,x59, x5E,x5F, x5C,x5D, x52,x53, x50,x51, x56,x57, x54,x55, ...).
+
+When reading a SAS7BDAT file, the page sequence numbers may be ignored.  When writing a SAS7BDAT file, a known sequence can used.
+
+A relatively simple page sequence is one that starts with xF4A4FFF6.  It increments the low four bits with the pattern x6,x7, x4,x5, x2,x3, x0,x1, xE,xF, xC,xD xA,xB, x8,x9.  To go higher than x9, the low four bits restart at x6 and the rest of the number (xFFA4FF??) decrements by 1.
+
+For example::
+
+  xF4A4FFF6 - initial
+  xF4A4FFF7 - page 1
+  xF4A4FFF4 - page 2
+  xF4A4FFF5 - page 3
+  xF4A4FFF2 - page 4
+  xF4A4FFF3 - page 5
+  xF4A4FFF0 - page 6
+  xF4A4FFF1 - page 7
+  xF4A4FFFE - page 8
+  xF4A4FFFF - page 9
+  xF4A4FFFC - page 10
+  xF4A4FFFD - page 11
+  xF4A4FFFA - page 12
+  xF4A4FFFB - page 13
+  xF4A4FFF8 - page 14
+  xF4A4FFF9 - page 15
+
+  xF4A4FFE6 - page 16
+  xF4A4FFE7 - page 17
+  ...
+  xF4A4FF08 - page 254
+  xF4A4FF09 - page 255
+  xF4A4FEF6 - page 256
+  xF4A4FEF7 - page 257
+  ...
+
+
 SAS7BDAT Pages
 ==============
 
-Following the SAS7BDAT header are pages of data. Each page can be one of (at least) four types. The first three are those that contain meta-information (e.g. field/column attributes), packed binary data, or a combination of both. These types are denoted 'meta', 'data', and 'mix' respectively. Meta-information is required to correctly interpret the packed binary information. Hence, this information must be parsed first. In test files, 'meta' and 'mix' pages always precede 'data' pages. In some test data files, there is a fourth page type, denoted 'amd' which appears to encode additional meta information. This page usually occurs last, and appears to contain amended meta information.
+Following the SAS7BDAT header are pages of meta-information and data. Each page can be one of (at least) four types. The first three are those that contain meta-information (e.g. field/column attributes), packed binary data, or a combination of both. These types are denoted 'meta', 'data', and 'mix' respectively. Meta-information is required to correctly interpret the packed binary information. Hence, this information must be parsed first. A 'meta' page contains only meta-information. A 'mix' page contains both meta-information and data.  A 'data' page contains only data.  In test files, the pages are ordered as zero or more 'meta' pages, followed by a 'mix' page, followed by zero or more 'data' pages. In some test data files, there is a fourth page type, denoted 'amd'. This page usually occurs last, and appears to contain amended meta-information.
 
-The `page offset table`_ below describes each page type. Byte offsets appended with one of '(meta/mix)', '(mix)', or '(data)' indicate that the corresponding length and description apply only to pages of the listed type. Provisionally, the internal structure of the 'amd' page type is considered identical to the 'meta' page type.   
+Conceptually, all pages have the same structure and some parts are optional::
+
+  ---------------------------------
+  |            header             |  required 24|40 byte header
+  |-------------------------------|
+  |      subheader pointers       |  meta-information
+  |-------------------------------|
+  |  SAS7BDAT packed binary data  |  data
+  |-------------------------------|
+  |         unused space          |
+  |-------------------------------|
+  |  deleted flags for data rows  |  data
+  |-------------------------------|
+  | subheaders (meta-information) |  meta-information
+  ---------------------------------
+
+The `page offset table`_ below describes each page type.
 
 Page Offset Table
 -----------------
@@ -221,16 +305,17 @@ Page Offset Table
 ==============  ==============	======  ===============================================
 offset		length		conf.	description
 ==============  ==============	======  ===============================================
-0		4		low	int, page sequence signature?
-4		12|28		low	*????????????* length 12 or 28 (**u64**)
-B		2		medium	int, bit field `page type`_ := _PGTYPE; B = 16|32
-B+2		2		medium	int, data block count := _`BC`
-B+4		2		medium	int, `subheader pointers`_ count := _`SC` <= `BC`_
-B+6		2		low	*????????????*
-B+8		SC*SL		medium	SC `subheader pointers`_, SL = 12|24
-B+8+SC*SL	DL		medium	if NRD>0, 8 byte alignment; DL = (B+8+SC*SL+7) % 8 * 8
-B+8+SC*SL+DL	RC*`RL`_	medium	`SAS7BDAT packed binary data`_ data row count := RC = (BC-SC)
-C		%`PL`_		medium  subheader data and/or filler; C = (B+8+SC*SL+DL+RC*RL)
+0		4		high	int, next `Page Sequence Number`_
+4		8|20		low	*????????????*
+12|24		4|8		low	number of unused bytes on page
+16|32		2		medium	int, bit field `page type`_ := _PGTYPE
+18|34		2		medium	int, data block count := _`BC`
+20|36		2		medium	int, `subheader pointers`_ count := _`SC` <= `BC`_
+22|38		2		low	*????????????*
+24|40		SC*SL		high	SC `subheader pointers`_, SL = 12|24
+24|40+SC*SL	DL		medium	8 byte alignment padding; DL = SC*SL - (((SC*SL + 7) % 8) * 8)
+24|40+SC*SL+DL	RC * RL_	medium	`SAS7BDAT packed binary data`_ data row count := RC = (BC-SC)
+B		% PL_		medium  subheader data, deleted flags, and/or unused bytes
 ==============  ==============	======  ===============================================
 
 Page Type
@@ -249,17 +334,16 @@ PGTYPE	name	subheaders	uncompressed row data (after subheaders)	compressed row d
 
 There are at least four page types 'meta', 'data', 'mix', and 'amd'. These types are encoded in the most significant byte of a two byte bit field at page offset 16|32. If no bit is set, the following page is of type 'meta'. If the first, second, or third bits are set, then the page is of type 'data', 'mix', or 'amd', respectively. Hence, if the two bytes are interpreted as an unsigned integer, then the 'meta', 'data', 'mix', and 'amd' types correspond to 0, 256, 512, and 1024, respectively. In compressed files, other bits (and sometimes multiple bits) have been set (e.g., ``1 << 16 | 1 << 13``, which is ``-28672`` signed, or ``36864`` unsigned). However, the pattern is unclear.
 
-If a page is of type 'meta', 'mix', or 'amd', data beginning at offset byte 24|40 are a sequence of SC SL-byte `subheader pointers`_, which point to an offset farther down the page. `SAS7BDAT Subheaders`_ stored at these offsets hold meta information about the database, including the column names, labels, and types.    
-If a page is of type 'mix', then **packed binary data begin at the next 8 byte boundary following the last subheader pointer**. In this case, the data begin at offset B+8+SC*SL+DL, where DL = (B+8+SC*SL+PL+7) % 8 * 8, and '%' is the modulo operator. 
+If a page has meta-information, then it is of type 'meta', 'mix', or 'amd' and beginning at offset byte 24|40 are a sequence of SC SL-byte `subheader pointers`_, which point to an offset farther down the page, starting at the end of the page and moving backward. `SAS7BDAT Subheaders`_ stored at these offsets hold meta-information about the database, including the column names, labels, and types.
 
-If a page is of type 'data', then packed binary data begin at offset 24|40.
+If a page has data, then it is of type 'mix' or 'data'.  In page of type 'mix', packed binary data **begins at the next 8 byte boundary following the last subheader pointer**.  Formally, the data begin at offset 24|40+SC*SL+DL, where DL = (24|40+SC*SL+7) % 8 * 8 and '%' is the modulo operator.  If a page is of type 'data', then packed binary data begins at offset 24|40, because SC=0.
 
-The 'comp' page was observed as page 2 of the compress_yes.sas7bdat test file (not distributed with the ``sas7bdat`` package). It has BC and SC fields, but no subheader pointers. It contains some initial data and 2 tables. The first table has many rows of length 24; its purpose is unknown. The second table has one entry per data page with the page number and the number of data rows on the page for SC pages. It could be used to access a particular row without reading all preceding data pages.
+The 'comp' page was observed as page 2 of the `compress_yes.sas7bdat` test file (not distributed with the ``sas7bdat`` package). It has BC and SC fields, but no subheader pointers. It contains some initial data and 2 tables. The first table has many rows of length 24; its purpose is unknown. The second table has one entry per data page with the page number and the number of data rows on the page for SC pages. It could be used to access a particular row without reading all preceding data pages.
 
 Subheader Pointers
 ++++++++++++++++++
 
-The subheader pointers encode information about the offset and length of subheaders relative to the beginning of the page where the subheader pointer is located. The purpose of the last four bytes of the subheader pointer are uncertain, but may indicate that additional subheader pointers are to be found on the next page, or that the corresponding subheader is not crucial.
+The subheader pointers encode information about the offset and length of subheaders relative to the beginning of the page where the subheader pointer is located.
 
 =======	======  ======  ===============================================
 offset	length	conf.	description
@@ -272,7 +356,7 @@ offset	length	conf.	description
 12|24		high	Total length of subheader pointer 12|24 (**u64**), SL 
 =======	======  ======  ===============================================
 
-QL is sometimes zero, which indicates that no data is referenced by the corresponding subheader pointer. When this occurs, the subheader pointer may be ignored.
+When COMP=1, the subheader pointer should be ignored.  In this case QL is usually 0.  From observation, the final subheader pointer on a page always has COMP=1.  This may be used to indicate the end of the subheader pointers array.
 
 =======	============
 `COMP`_	description
@@ -281,6 +365,8 @@ QL is sometimes zero, which indicates that no data is referenced by the correspo
 1	truncated (ignore data)
 4	RLE compressed row data with control byte
 =======	============
+
+The subheaders with ST=0 have fixed size and the subheaders with ST=1 have a variable size.  All subheaders with ST=1 have an integer at offset 4|8 that is 4|8 bytes long whose value is the size of the subheader minus the size of the signature and the padding at the end of the subheader.
 
 ====	============
 ST	subheaders
@@ -294,71 +380,80 @@ ST	subheaders
 SAS7BDAT Subheaders
 ===================
 
-Subheaders contain meta information regarding the SAS7BDAT database, including row and column counts, column names, labels, and types. Each subheader is associated with a four- or eight-byte 'signature' (**u64**) that identifies the subheader type, and hence, how it should be parsed.
+Subheaders contain meta-information regarding the SAS7BDAT database, including row and column counts, column names, labels, and types. Each subheader is associated with a four- or eight-byte 'signature' (**u64**) that identifies the subheader type, and hence, how it should be parsed.
+
+Some subheaders types may appear more than once.  The `Column Format subheader` is repeated once per variable.  The subheaders with variable sizes may appear more than once if its content would not fit in the space remaining on the page or within the maximum subheader size of 32767 bytes.  In all cases, when a subheader type appears more than once, all subheaders of the same type are consecutive within the SAS7BDAT file.  Furthermore, the subheader types are ordered as follows within the `Subheader Pointers`_ table.
+
+1. `Row Size subheader`_
+2. `Column Size subheader`_
+3. `Subheader Counts subheader`_
+4. `Column Text subheader`_
+5. `Column Name subheader`_
+6. `Column Attributes subheader`_
+7. `Column List subheader`_
+8. `Column Format and Label subheader`_
+
+The subheaders cross-reference each other in two structured ways: with a "subheader location" and a "text reference".
+
+A "_`subheader location`" field is composed of two integers, each 4|8 bytes long.  The first integer is the index of the page that has the subheader, with 1 indicating the page that immediately follows the file header.  The second integer is the index of the subheader pointer within the page's subheader pointer table.  A value of 1 indicates the subheader that is referred to by the first subheader pointer in the table, which is typically the last subheader physically on the page.  Both values may be 0 to indicate that the referant subheader does not exist.
+
+A "_`text reference`" field is a pointer to a string of meta-information text, such as a variable name or a variable label.  All meta-information text for a SAS7BDAT is held within a `Column Text subheader`_ and a "text reference" is the location of a string within those subheaders.  A text reference field consists of three integers, each 2 bytes long.  The first integer is the index of the Column Text subheader, since there may be more than one of them.  A value of 0 indicates the first Column Text subheader.  The second integer is the offset of the text within the Column Text subheader from the end of the signature at offset 4|8.  This is always a multiple of 4.  The third integer is the size of the text, in bytes.  All references to the empty string (a string with 0 size) are given as three zeros.
 
 Row Size Subheader
 ------------------
 
-The row size subheader holds information about row length (in bytes), their total count, and their count on a page of type 'mix'.  Fields at offset 28|56 and higher are not needed to read the file, but are documented here for completeness.  The four test files used for example data in the higher fields are ``eyecarex.sas7bdat``, ``acadindx.sas7bdat``, ``natlterr1994.sas7bdat``, ``txzips.sas7bdat`` (non-Intel/Intel x regular/u64).
+The row size subheader holds information about row length (in bytes), their total count, and their count on a page of type 'mix'.  Fields at offset 28|56 and higher are not needed to read the file, but are documented here for completeness.  Some of these appear to be buffer sizes that could be preallocated to hold the rest of the dataset.  Others appear to the location of metadata-information.  The four test files used for example data in the higher fields are ``eyecarex.sas7bdat``, ``acadindx.sas7bdat``, ``natlterr1994.sas7bdat``, ``txzips.sas7bdat`` (non-Intel/Intel x regular/u64).
+
 
 =========	=========	======  ===============================================
 offset		length		conf.	description
 =========	=========	======  ===============================================
 0		4|8		high	binary, signature xF7F7F7F7|xF7F7F7F700000000
-4|8		16|32		low	*????????????*
-20|40		4|8		high	int, row length (in bytes) := _`RL`
-24|48		4|8		high	int, total row count := TRC 
-28|56		8|16		low	*????????????*
+4|8		4|8		low	*????????????*; x00 has been observed on **u64**
+8|16		4|8		low	*????????????*; the number of subheaders + 2
+12|24		4|8		low	*????????????*; x00 has been observed on **u64**
+16|32		4|8		low	*????????????*; x00223011 has been observed on **u64**
+20|40		4|8		high	int, row length (in bytes) := _`RL`.  This is the sum of all column lengths, rounded up to the nearest multiple of 8 if there's a numeric column.
+24|48		4|8		high	int, total row count := TRC, includes deleted rows
+28|56		4|8		low	*????????????*; number of deleted rows
+32|64		4|8		low	*????????????*; x00 has been observed on **u64**
 36|72		4|8		medium	int, number of `Column Format and Label Subheader`_ on first page where they appear := _`NCFL1`
 40|80		4|8		medium	int, number of `Column Format and Label Subheader`_ on second page where they appear (or 0) := _`NCFL2`
-44|88		8|16		low	*????????????*
+44|88		4|8 		medium	Sum of the size of the payload of all `Column List Subheader`_ (subheader size - 28)
+48|92		8|8		medium	Sum of the length of all variable names
 52|104		4|8		medium	int, page size, equals PL
-56|112		4|8		low	*????????????*
-60|120		4|8		medium	int, max row count on "mix" page := _`MRC`
-64|128		8|16		medium	sequence of 8|16 FF, end of initial header
+56|112		4|8		low	*????????????*; x00 has been observed on **u64**
+60|120		4|8		medium	int, max possible row count on "mix" page := _`MRC`.  This may be larger than the actual number of rows on the mix page.
+64|128		8|16		medium	sequence of 8|16 xFF, end of initial header
 72|144		148|296		medium	zeroes
-220|440		4		low	int, page sequence signature (equals current page sequence signature)
-224|444		40|68		low	zeroes
-264|512		4|8		low	int, value 1 observed in 4 test files
-268|520		2		low	int, value 2 observed
-270|522		2|6		low	zeroes (pads length of 3 fields to 8|16)
-272|528		4|8		medium	int, number of pages with subheader data := NPSHD
-276|536		2		medium	int, number of subheaders with positive length on last page with subheader data := NSHPL
-278|538		2|6		low	zeroes
-280|544		4|8		low	int, values equal to NPSHD observed
-284|552		2		low	int, values equal to NSHPL+2 observed
-286|554		2|6		low	zeroes
-288|560		4|8		medium	int, number of pages in file, equals PC
-292|568		2		low	int, values 22,26,9,56 observed
-294|570		2|6		low	zeroes
-296|576		4|8		low	int, value 1 observed
-300|584		2		low	int, values 7|8 observed
-302|586		2|6		low	zeroes
+220|440		4		low	int, initial `Page Sequence Number`_ (equals value at offset 0 of first page)
+224|444		28|44		low	zeroes
+252|488		4|8		medium	zero usually, or 1 if dataset has processed with a PROC DATASETS REPAIR statement
+256|496		4|8		medium	zero usually, or a timestamp if the dataset was processed with a PROC DATASETS REPAIR statement
+260|504		4|8		medium	zero usually, or a timestamp if the dataset was processed with a PROC DATASETS REPAIR statement
+264|512		8|16		low	two 4|8 byte integer values 1, 2 observed.  May be the `subheader location`_ of the first `Column Size Subheader`_
+272|528		8|16		medium	two 4|8 byte integer values, a `subheader location`_ of the final subheader that isn't truncated (COMP is not 1)
+280|544		8|16		medium	two 4|8 byte integer values that indicate the location of the first row of data.  This is like a `subheader location` in that the first integer is a page index and the second one is "block" index.  The integers are 0 and 3 if the dataset has no rows (TRC=0).  If the first row is on a 'mix' page, then the second integer the number of subheaders on the page plus 1.  Otherwise, the values are the index of the first 'data' page and 1.
+288|560		8|16		medium	two 4|8 byte integer values that indicate the location of the final row of data.  The integers are 0 and 3 if the dataset has no rows (TRC=0).  If the final row is on a 'mix' page, then the second integer is the number of subheaders on the page plus the number of rows (TRC).  Otherwise, the values are the index of the final 'data' page and the number of rows on that page.
+296|576		8|16		medium	the `subheader location`_ of the first `Column Format and Label subheader`_
 304|592		40|80		low	zeroes
-344|672		2		low	int, value 0
-346|674		2		low	int, values 0|8
-348|676		2		low	int, value 4
-350|678		2		low	int, value 0
-352|680		2		low	int, values 12,32|0
-354|682		2		low	int, length of Creator Software string := LCS
-356|684		2		low	int, value 0
-358|686		2		low	int, value 20
-360|688		2		low	int, value of 8 indicates MXNAM and MXLAB valid := IMAXN
-362|690		8		low	zeroes
-370|698		2		low	int, value 12
-372|700		2		low	int, value 8
-374|702		2		low	int, value 0
-376|704		2		low	int, value 28
-378|706		2		low	int, length of Creator PROC step name := LCP
-380|708		36		low	zeroes
+344|672		6		low	three two-byte integers: usually <0, 0|8, 4>.  This may be a `text reference`_ to the compression string.
+350|678		6		high	A `text reference`_ to the dataset label
+356|684		6		medium	A `text reference`_ to the dataset type, also called Creator Software := CSTR
+362|690		6		low	zeroes, possibly a `text reference`_ to something that is the empty string in all test data files
+370|698		6		low	three two-byte integers: usually <12, 8, 0>.  Possibly a `text reference`_ to the second entry in the first Column Text subheader.
+376|704		6		low	A `text reference`_ to the Creator PROC step name := CPTR
+382|710		34		low	zeroes
 416|744		2		low	int, value 4
 418|746		2		low	int, value 1
-420|748		2		low	int, number of Column Text subheaders in file := _`NCT`
-422|750		2		low	int, max length of column names := MXNAM (see IMAXN)
-424|752		2		low	int, max length of column labels := MXLAB (see IMAXN)
+420|748		2		medium	int, number of Column Text subheaders in file := _`NCT`
+422|750		2		medium	int, length of longest column name := MXNAM
+424|752		2		medium	int, length of longest column label := MXLAB
 426|754		12		low	zeroes
-438|766		2		medium	int, number of data rows on a full page INT[(PL - 24 / 40)/`RL`_]; 0 for compressed file
-440|768		27		low	zeroes
+438|766		2		medium	int, number of data rows on a full 'data' page: INT[8*(PL - 24|40)/(1+8*`RL`_)] (the space on a page after the header, divided by the row length + 1 bit for each row's deleted flag, rounded down); 0 for compressed file
+440|768		4|8		low	zeroes
+444|776		4|8		medium	TRC, repeated
+448|784		19|11		low	zeroes
 467|795		1		low	int, bit field, values 1,5
 468|796		12		low	zeroes
 480|808				medium	Total length of subheader, QL
@@ -369,7 +464,7 @@ offset		length		conf.	description
 Column Size Subheader 
 ---------------------
 
-The `column size subheader`_ holds the number of columns (variables).
+The column size subheader holds the number of columns (variables).
 
 =======	======	======	=================================
 offset	length	conf.	description
@@ -406,13 +501,9 @@ The subheader count vectors encode information for each of 4 common subheader ty
 =======	======  ======  =====================================================
 offset	length	conf.	description
 =======	======  ======  =====================================================
-0	4|8	high	int, signature (see list below)
-4|8	4|8	medium	int, page where this subheader first appears := PAGE1
-8|16	2	medium	int, position of subheader pointer in PAGE1 := LOC1
-10|18	2|6	low	*????????????*  zero padding
-12|24	4|8	medium	int, page where this subheader last appears := PAGEL
-16|32	2	medium	int, position of subheader pointer in PAGEL := LOCL
-18|34	2|6	low	*????????????*	zero padding
+0	4|8	high	int, subheader signature (see list below)
+4|8	8|16	medium	two 4|8 byte integer values, the `subheader location`_ of where this subheader first appears := <PAGE1, LOC1>
+12|24	8|16	medium	two 4|8 byte integer values, the `subheader location`_ of where this subheader last appears := <PAGEL, LOCL>
 20|40		medium	Total length of subheader count vector, LSCV
 =======	======  ======  =====================================================
 
@@ -420,27 +511,27 @@ The LOC1 and LOCL give the positions of the corresponding subheader pointer in P
 
 The first 7 binary signatures in the `Subheader Count Vectors`_ array are always:
 
-=========	====================
-signature	description
-=========	====================
--4		Column Attributes
--3		Column Text
--1		Column Names
--2		Column List
--5		unknown signature #1
--6		unknown signature #2
--7		unknown signature #3
-=========	====================
+===================	====================
+subheader signature	description
+===================	====================
+-4			Column Attributes
+-3			Column Text
+-1			Column Names
+-2			Column List
+-5			unknown signature #1
+-6			unknown signature #2
+-7			unknown signature #3
+===================	====================
 
-The remaining 5 out of 12 signatures are zeros in the observed source files. Presumably, these are for subheaders not yet defined, or not present in the collection of test files. 
+The remaining 5 out of 12 signatures are zeros in the observed source files. Presumably, these are for subheaders not yet defined, or not present in the collection of test files.
 
-A `Column Format and Label Subheader`_ may appear on multiple pages, but are not indexed in Subheader Counts. The variables NCFL1 and NCFL2 in the `Row Size subheader`_ may be helpful if you want to know in advance if these appear across multiple pages.
+A `Column Format and Label subheader`_ may appear on multiple pages, but are not indexed in Subheader Counts. The variables NCFL1 and NCFL2 in the `Row Size subheader`_ may be helpful if you want to know in advance if these appear across multiple pages.
 
 
 Column Text Subheader
 ---------------------
 
-The column text subheader contains a block of text associated with columns, including the column names, labels, and formats. However, this subheader is not sufficient to parse this information. Other subheaders (e.g. the `column name subheader`_), which point to specific elements within this subheader are also needed. 
+The column text subheader contains meta-information text of the SAS7BDAT. This text is mostly associated with columns, including the column names, labels, and formats.  Some text is associated with the overall dataset, including the dataset label, type, and compression algorithm name.  This subheader does not include information about the purpose of each string, or even where one string ends and the next one begins.  Other subheaders (e.g. the `column name subheader`_) have `text reference`_ fields that refer to specific strings within this subheader.  They provide the semantics of how each string is signficiant to the dataset.
 
 =======	======  ======  ===============================================
 offset	length	conf.	description
@@ -456,15 +547,17 @@ offset	length	conf.	description
 varies	%QL	high	ascii, combined column names, labels, formats
 =======	======  ======  ===============================================
 
-This subheader sometimes appears more than once; each is a separate array. If so, the "column name index" field in `column name pointers`_ selects a particular text array - 0 for the first array, 1 for the second, etc. Similarly, "column format index" and "column label index" fields also select a text array. Offsets to strings within the text array are multiples of 4, so the column names and labels section of the array often contains many nulls for padding.
+This subheader sometimes appears more than once; each is a separate array. The "subheader index" component of a `text reference`_ selects a particular text array.
 
-The variables LCS and LCP from the `Row Size subheader`_ refer to a text field at the start of the text array (at offset 16|20) in the first Column Text subheader (before the column name strings).  This text field also contains compression information.  The following logic decodes this initial field:
+The offset of a text reference is always a multiple of 4, so the strings within this subheader often end with a few bytes of value x00 for padding.
 
-1. If the first 8 bytes of the field are blank, file is not compressed, and set LCS=0.  The Creator PROC step name is the LCP bytes starting at offset 16.
-2. If LCS > 0 (still), the file is not compressed, the first LCS bytes are the Creator Software string (padded with nulls).  Set LCP=0.  Stat/Transfer files use this pattern.
-3. If the first 8 bytes of the field are ``SASYZCRL``, the file is compressed with Run Length Encoding.  The Creator PROC step name is the LCP bytes starting at offset 24.
-4. If the first 8 bytes are nonblank and options 2 or 3 above are not used, this probably indicates COMPRESS=BINARY.  We need test files to confirm this, though.
+The variables CSTR and CPTR from the `Row Size subheader`_ are each a `text reference`_ to strings at the start of the first Column Text subheader (before the column name strings).  These text fields also contains compression information.  The following logic decodes these strings:
 
+1. Set LCS=length of CSTR, LCP=length of CPTR
+2. If the first 8 bytes of the field are blank, file is not compressed, and set LCS=0.  The Creator PROC step name is the LCR bytes starting at offset 16.
+3. If LCS > 0 (still), the file is not compressed, the first LCS bytes are the Creator Software string (padded with nulls).  Set LCP=0.  Stat/Transfer files use this pattern.
+4. If the first 8 bytes of the field are ``SASYZCRL``, the file is compressed with Run Length Encoding.  The Creator PROC step name is the LCP bytes starting at offset 24.
+5. If the first 8 bytes are nonblank and options 2 or 3 above are not used, this probably indicates COMPRESS=BINARY.  We need test files to confirm this, though.
 
 Column Name Subheader
 ---------------------
@@ -488,6 +581,8 @@ Each column name subheader holds CMAX column name pointers. When there are multi
 Column Name Pointers
 ++++++++++++++++++++
 
+Each column name pointer is a `text reference`_ with two bytes of padding.
+
 ======	======  ======  ======================================================
 offset	length	conf.	description
 ======	======  ======  ======================================================
@@ -503,6 +598,9 @@ Column Attributes Subheader
 ---------------------------
 
 The column attribute subheader holds information regarding the column offsets within a data row, the column widths, and the column types (either numeric or character). The column attribute subheader sometimes occurs more than once (in test data). In these cases, column attributes are applied in the order they are parsed.
+
+Columns are not always pysically laid out within a row as they appear in the dataset. The numeric columns appear first and their relative order is preserved.  This may be because reading numeric values is more efficent if they occur at offsets that are muliples of 8-bytes. By putting all of the numeric variables first, this alignment constraint can be accomplished without adding any padding between the variables.
+
 
 =======	=========	======	===================================================
 offset	length		conf.	description
@@ -524,22 +622,23 @@ offset		length	conf.	description
 ==============  ======  ======  ===============================================
 0		4|8	high	int, column offset in data row (in bytes)
 4|8		4	high	int, column width
-8|12		2	low	name length flag
+8|12		2	medium	name flag
 10|14		1	high	int, column type (1 = numeric, 2 = character)
 11|15		1	low	*????????????*
 12|16			high	Total length of column attribute vector, LCAV
 ==============  ======  ======  ===============================================
 
-Observed values of name length flag in the source files:
+Observed values of name flag in the source files:
 
-================  =================================================================
-name length flag		description
-================  =================================================================
-4			name length <= 8
-1024			usually means name length <= 8 , but sometimes the length is 9-12
-2048			name length > 8
-2560			name length > 8
-================  =================================================================
+========= 	=================================================================
+name flag	description
+=========	=================================================================
+4		name length <= 8
+1024		usually means name length <= 8 but sometimes the length is 9-12
+2048		name length > 8 but is otherwise described by VALIDVARNAME=V7
+2560		name length > 8
+3072		name must be quoted in SAS; it begins with a digit or contains non-alphanumeric characters
+=========	=================================================================
 
 
 Column Format and Label Subheader
@@ -551,13 +650,15 @@ The column format and label subheader contains pointers to a column format and l
 offset	length	conf.	description
 =======	=======	======	===============================================
 0	4|8	high	int, signature -1026 (hex FEFB & 2 or 6 FFs)
-4|8	30|38	low	*????????????*
-34|46	2	high	int, column format index to select `Column Text Subheader`_
-36|48	2	high	int, column format offset w.r.t. end of selected Column Text signature.  A multiple of 4.
-38|50	2	high	int, column format length
-40|52	2	high	int, column label index to select `Column Text Subheader`_
-42|54	2	high	int, column label offset w.r.t. end of selected Column Text signature.  A multiple of 4.
-44|56	2	high	int, column label length
+4|8	12|16	low	*????????????*; zeros
+16|24	2	high	integer, the "width" portion of a column's FORMAT, or 0 if it has no FORMAT
+18|26	2	high	integer, the "digits" portion of a column's FORMAT, or 0 if it has no FORMAT
+20|28	2	high	integer, the "width" portion of a column's INFORMAT, or 0 if it has no INFORMAT
+22|30	2	high	integer, the "digits" portion of a column's INFORMAT, or 0 if it has no INFORMAT
+24|32	4|8	low	*????????????*; zeros
+28|40	6	high	A `text reference`_ to the text portion of a column's INFORMAT
+34|46	6	high	A `text reference`_ to the text portion of a column's FORMAT
+40|52	6	high	A `text reference`_ to the text portion of a column's LABEL
 46|58	6	low	*????????????*
 52|64		medium	Total length of subheader, QL
 =======	=======	======	===============================================
@@ -565,13 +666,15 @@ offset	length	conf.	description
 Column List Subheader
 ---------------------
 
-The purpose of this subheader is not clear. But the structure is partly identified. Information related to this subheader was contributed by Clint Cummins.  eyecarex (created by Stat/Transfer) does not have this subheader.
+The purpose of this subheader is not clear. But the structure is partly identified. Information related to this subheader was contributed by Clint Cummins.  ``eyecarex.sas7bdat`` (created by Stat/Transfer) does not have this subheader.
+
+This subheader is not present in datasets which have only one column.
 
 =======	======	======	===============================================
 offset	length	conf.	description
 =======	======	======	===============================================
 0	4|8	high	int, signature -2 (hex FE & 3 or 7 FFs)
-4|8	2	low	int, value close to offset in subheader pointer
+4|8	2	medium	size of data in subheader; CL * 2 + MCL - 4|8
 6|10	6	low	*????????????* 
 12|16	4|8	medium	int, length of remaining subheader
 16|24	2	low	int, usually equals NCOL
@@ -588,7 +691,11 @@ MCL	8	low	usually zeros, 30|38 + 2*CL := MCL
 Column List Values
 ++++++++++++++++++
 
-These values are 2 byte integers, with (CL-NCOL) zero values. Each nonzero value is unique, between -NCOL and NCOL. The significance of signedness and ordering is unknown. The values do not correspond to a sorting order of columns.
+These values are 2 byte integers, with (CL-NCOL) zero values.  All numbers from 1 to NCOL are present exactly once in this list, given as either positive or negative.  There are never more zero values than non-zero values.  The significance of signedness and ordering is unknown. The values do not correspond to a sorting order of columns.
+
+CL is a function purely of NCOL.  The function never decreases as NCOL increases.
+
+The sign and order of the values appears to be related to the column names.
 
 Compressed Binary Data Subheader
 --------------------------------
@@ -678,7 +785,9 @@ Once a data row is uncompressed, use the `SAS7BDAT Packed Binary Data`_ descript
 SAS7BDAT Packed Binary Data
 ===========================
 
-SAS7BDAT packed binary are uncompressed, and appear after any subheaders on the page; see the `Page Offset Table`_.  These data are stored by rows, where the size of a row (in bytes) is defined by the `row size subheader`_. When multiple rows occur on a single page, they are immediately adjacent. When a database contains many rows, it is typical that the collection of rows (i.e. their data) is evenly distributed to a number of 'data' pages. However, in test files, no single row's data is broken across two or more pages. A single data row is parsed by interpreting the binary data according to the collection of column attributes contained in the `column attributes subheader`_. Binary data can be interpreted in two ways, as ASCII characters, or as floating point numbers. The column width attribute specifies the number of bytes associated with a column. For character data, this interpretation is straight-forward. For numeric data, interpretation of the column width is more complex.
+SAS7BDAT packed binary are uncompressed, and appear after any subheaders on the page; see the `Page Offset Table`_.  These data are stored by rows, where the size of a row (in bytes) is defined by the RL field in the `row size subheader`_.  The location of each column's values within the row is given in the `column attributes subheader`_.  If at least one column has a numeric type, then the row length is padded to a multiple of 8 so that the numeric columns have a natural alignment.
+
+When multiple rows occur on a single page, they are immediately adjacent. When a dataset contains many rows, it is typical that the collection of rows (i.e. their data) is evenly distributed to a number of 'data' pages. However, in test files, no single row's data is broken across two or more pages. A single data row is parsed by interpreting the binary data according to the collection of column attributes contained in the `column attributes subheader`_. Binary data can be interpreted in two ways, as ASCII characters, or as floating point numbers. The column width attribute specifies the number of bytes associated with a column. For character data, this interpretation is straight-forward. For numeric data, interpretation of the column width is more complex.
 
 The common binary representation of floating point numbers has three parts; the sign (``s``), exponent (``e``), and mantissa (``m``). The corresponding floating point number is ``s * m * b ^ e``, where ``b`` is the base (2 for binary, 10 for decimal). Under the IEEE 754 floating point standard, the sign, exponent, and mantissa are encoded by 1, 11, and 52 bits respectively, totaling 8 bytes. In SAS7BDAT file, numeric quantities can be 3, 4, 5, 6, 7, or 8 bytes in length. For numeric quantities of less than 8 bytes, the remaining number of bytes are truncated from the least significant part of the mantissa. Hence, the minimum and maximum numeric values are identical for all byte lengths, but shorter numeric values have reduced precision.
 
@@ -712,6 +821,11 @@ DATETIME  Number of seconds since January 1, 1960  as.POSIXct
 ========  =======================================  ============
 
 There are many additional format strings for numeric and character fields.
+
+Deleted Row Flags
+-----------------
+
+For each row of data on a page, there is a bit in the deleted row flags section that declares whether the row is deleted.  A set bit (1) indicates that the row is deleted and a clear bit (0) indicates that the row is not deleted. The bits are packed such that a single byte describes the deleted status of eight data rows.
 
 Platform Differences
 ====================
@@ -784,7 +898,6 @@ ToDo
 ====
 
 - obtain test files which use COMPRESS=BINARY, and develop identification and uncompression procedures
-- look for data which will reliably distinguish between structural subheaders (which have one of the known signatures) and uncompressed row data, which may have row data in the signature position that matches one of the known signatures.  Both use COMP=0.  Are NPSHD and NSHPL sufficient to do this?
 - obtain test files with more than 2.1 billion (and more than 4.2 billion) data rows, i.e. where 8 byte integer TRC in **u64** is apparently needed.  Do the non-u64 files handle this, with additional fields beyond the 4 byte TRC used for segmentation?  Is TRC a (signed) int or (unsigned) uint?
 - identify any SAS7BDAT encryption flag (this is not the same as 'cracking', or breaking encryption); we just identify if a file is encrypted and not readable without a key
 - experiment further with 'amendment page' concept
