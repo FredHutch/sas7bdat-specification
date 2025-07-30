@@ -1,5 +1,10 @@
-This package contains documents and software related to a compatibility study of the SAS7BDAT database file format. The 'data/sas7bdat.sources.RData' references a collection of SAS7BDAT database files freely avalilable from internet resources. The data are not redistributed due to licensing concerns. Files in the collection are used for testing and investigating the SAS7BDAT file format. 
- 
-The included vignette documents various aspects of the compatibility study, including a detailed description of the binary structure of SAS7BDAT formatted databases. 
-  
-The R/ directory contains R (www.r-project.org) code implementing a prototype SAS7BDAT file reader.
+This repository contains a reverse-engineered specification of the SAS7BDAT file format.
+
+The specification was written by Dr. Matthew Shotwell and contributed to by Dr. Clint Cummings and others.
+
+David Costanzo forked Dr. Shotwell's repository to be able to contribute to the specification.
+Ths was done as a derivative work under the Creative Commons Attribution-ShareAlike 3.0 Unported License.
+To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/3.0/.
+
+The repository has also been restructured to make the specification more prominent.
+The R code has been removed, which also means removing the code that downloads sample data.
