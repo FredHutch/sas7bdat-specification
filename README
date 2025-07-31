@@ -16,3 +16,12 @@ In order to allow contributions from multiple people but still have a specificat
 well, arbitrary choices must all be made the same way.
 
 Hexadecimal numbers must be represented with an x prefix.  For example, "x3F".
+
+Data Files
+-----------
+The specification was reverse-engineered by examining free SAS7BDAT files found on the Web.
+These datasets may not be public domain, so they cannot be included in this project.
+Instead, you can download them yourself.
+
+   cd test-files
+   ./download-test-files.sh

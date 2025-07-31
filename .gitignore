@@ -1,2 +1,4 @@
 .idea
 sas7bdat.pdf
+test-files/*.sas7bdat
+test-files/*.sas7bdat.txt
