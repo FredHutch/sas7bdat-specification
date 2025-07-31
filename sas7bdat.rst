@@ -607,7 +607,7 @@ offset      length      conf.   description
 422|750     2           medium  int, length of longest column name := MXNAM
 424|752     2           medium  int, length of longest column label := MXLAB
 426|754     12          low     zeroes
-438|766     2           medium  int, number of data rows on a full 'data' page: INT[8*(PL - 24|40)/(1+8*`RL`_)] (the space on a page after the header, divided by the row length + 1 bit for each row's deleted flag, rounded down); 0 for compressed file
+438|766     2           medium  int, number of data rows on a full 'data' page: INT[8*(PL - 24|40)/(1+8 * RL_)] (the space on a page after the header, divided by the row length + 1 bit for each row's deleted flag, rounded down); 0 for compressed file
 440|768     4|8         low     zeroes
 444|776     4|8         medium  TRC, repeated
 448|784     19|11       low     zeroes
