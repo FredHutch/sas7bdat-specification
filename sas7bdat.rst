@@ -96,6 +96,8 @@ Variables defined in an offset table are sometimes used in subsequent tables.
 Header Offset Table
 -------------------
 
+.. class:: offset-table
+
 ==============  ======  ======  ===============================================
 offset          length  conf.   description
 ==============  ======  ======  ===============================================
@@ -413,6 +415,8 @@ The `page offset table`_ below describes each page type.
 Page Offset Table
 -----------------
 
+.. class:: offset-table
+
 ==============  ==============  ======  ===============================================
 offset          length          conf.   description
 ==============  ==============  ======  ===============================================
@@ -432,16 +436,19 @@ B               % PL_           medium  subheader data, deleted flags, and/or un
 Page Type
 +++++++++
 
-======  ====    ==========  ========================================    ===================================
-PGTYPE  name    subheaders  uncompressed row data (after subheaders)    compressed row data (in subheaders)
-======  ====    ==========  ========================================    ===================================
-0       meta    yes (SC>0)  no  (BC=SC)                                 yes
-256     data    no  (SC=0)  yes (RC=BC)                                 no
-512     mix     yes (SC>0)  yes (RC=BC-SC)                              no
-1024    amd     yes?        yes?                                        no?
-16384   meta    yes (SC>0)  no (BC=SC)                                  yes
--28672  comp    no          no                                          no
-======  ====    ==========  ========================================    ===================================
+.. class:: page-type-table
+
+======  ====    ==========  ======================  ===================================
+PGTYPE  name    subheaders  uncompressed row data   compressed row data
+                            (after subheaders)      (in subheaders)
+======  ====    ==========  ======================  ===================================
+0       meta    yes (SC>0)  no  (BC=SC)             yes
+256     data    no  (SC=0)  yes (RC=BC)             no
+512     mix     yes (SC>0)  yes (RC=BC-SC)          no
+1024    amd     yes?        yes?                    no?
+16384   meta    yes (SC>0)  no (BC=SC)              yes
+-28672  comp    no          no                      no
+======  ====    ==========  ======================  ===================================
 
 There are at least four page types 'meta', 'data', 'mix', and 'amd'.
 These types are encoded in the most significant byte of a two byte bit field at page offset 16|32.
@@ -468,6 +475,8 @@ Subheader Pointers
 ++++++++++++++++++
 
 The subheader pointers encode information about the offset and length of subheaders relative to the beginning of the page where the subheader pointer is located.
+
+.. class:: offset-table
 
 ======= ======  ======  ===============================================
 offset  length  conf.   description
@@ -551,6 +560,7 @@ Some of these appear to be buffer sizes that could be preallocated to hold the r
 Others appear to the location of metadata-information.
 The four test files used for example data in the higher fields are ``eyecarex.sas7bdat``, ``acadindx.sas7bdat``, ``natlterr1994.sas7bdat``, ``txzips.sas7bdat`` (non-Intel/Intel x regular/u64).
 
+.. class:: offset-table
 
 =========   =========   ======  ===============================================
 offset      length      conf.   description
@@ -613,6 +623,8 @@ Column Size Subheader
 
 The column size subheader holds the number of columns (variables).
 
+.. class:: offset-table
+
 ======= ======  ======  =================================
 offset  length  conf.   description
 ======= ======  ======  =================================
@@ -631,6 +643,8 @@ Any of these subheaders may appear once or more. Multiple instances of a subhead
 The order in which data is read from multiple subheaders corresponds to the reading order (left to right) of columns.
 The structure of this subheader was deduced and reported by Clint Cummins.
 
+.. class:: offset-table
+
 =========   ======= ======  ===============================================
 offset      length  conf.   description
 =========   ======= ======  ===============================================
@@ -647,6 +661,8 @@ Subheader Count Vectors
 +++++++++++++++++++++++
 
 The subheader count vectors encode information for each of 4 common subheader types, and potentially 12 total subheader types.
+
+.. class:: offset-table
 
 ======= ======  ======  =====================================================
 offset  length  conf.   description
@@ -694,6 +710,8 @@ This subheader does not include information about the purpose of each string, or
 Other subheaders (e.g. the `column name subheader`_) have `text reference`_ fields that refer to specific strings within this subheader.
 They provide the semantics of how each string is significant to the dataset.
 
+.. class:: offset-table
+
 ======= ======  ======  ===============================================
 offset  length  conf.   description
 ======= ======  ======  ===============================================
@@ -729,6 +747,8 @@ Column Name Subheader
 Column name subheaders contain a sequence of `column name pointers`_ to the offset of each column name **relative to a** `column text subheader`_.
 There may be multiple column name subheaders, indexing into multiple column text subheaders.
 
+.. class:: offset-table
+
 ======= ======  ======  ====================================================
 offset  length  conf.   description
 ======= ======  ======  ====================================================
@@ -748,6 +768,8 @@ Column Name Pointers
 ++++++++++++++++++++
 
 Each column name pointer is a `text reference`_ with two bytes of padding.
+
+.. class:: offset-table
 
 ======  ======  ======  ======================================================
 offset  length  conf.   description
@@ -772,6 +794,7 @@ The numeric columns appear first and their relative order is preserved.
 This may be because reading numeric values is more efficient if they occur at offsets that are multiples of 8-bytes.
 By putting all of the numeric variables first, this alignment constraint can be accomplished without adding any padding between the variables.
 
+.. class:: offset-table
 
 ======= =========   ======  ===================================================
 offset  length      conf.   description
@@ -787,6 +810,8 @@ MCA     8|12        low     MCA = 12|16 + LCAV*CMAX
 
 Column Attribute Vectors 
 ++++++++++++++++++++++++
+
+.. class:: offset-table
 
 ==============  ======  ======  ===============================================
 offset          length  conf.   description
@@ -819,6 +844,8 @@ The column format and label subheader contains pointers to a column format and l
 Since the column label subheader only contains information regarding a single column, there are typically as many of these subheaders as columns.
 The structure of column format pointers was contributed by Clint Cummins.
 
+.. class:: offset-table
+
 ======= ======= ======  ===============================================
 offset  length  conf.   description
 ======= ======= ======  ===============================================
@@ -844,6 +871,8 @@ Information related to this subheader was contributed by Clint Cummins.
 ``eyecarex.sas7bdat`` (created by Stat/Transfer) does not have this subheader.
 
 This subheader is not present in datasets which have only one column.
+
+.. class:: offset-table
 
 ======= ======  ======  ===============================================
 offset  length  conf.   description
@@ -902,6 +931,8 @@ Each is an uint in the range 0-15.
 For example, control byte 82 (hex) is Command 8 and Length 2, and control byte F4 (hex) is command 15 (F hex) and Length 4.
 We have identified the functions of the 11 different Command values which are observed in the test files.
 The RLE structure was contributed by Clint Cummins.
+
+.. class:: rle-command-table
 
 ======= ======  =============   ============================
 Command Length  Name            Function

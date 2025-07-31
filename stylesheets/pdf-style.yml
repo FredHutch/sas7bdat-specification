@@ -1,0 +1,22 @@
+styles:
+  # For tables whose headers are: | Offset | Length | Confidence | Description |
+  # Sometimes the description is long and the table layout algorithm gives it
+  # so much space that it gives a single character to Offset, Length, and Confidence.
+  # This leads to a hard-to-read table.  This style sets an explicit width for the
+  # first three columns
+  offset-table:
+    parent: table
+    colWidths: [ 3cm, 2cm, 1.9cm, null ]
+
+  # The Page Type Table has long column headers on the final two columns.
+  # Without a style, the long column headers causes the column to take up so much space
+  # that the first three columns are only given one character width.
+  page-type-table:
+    parent: table
+    colWidths: [ 2cm, 1.5cm, 3cm, null, null ]
+
+  # Without a style, the long descriptions in the Run-Length-Encoding table causes
+  # the Command column to be given too little space.
+  rle-command-table:
+    parent: table
+    colWidths: [ 2.5cm, 1.75cm, 3cm, null, null ]
