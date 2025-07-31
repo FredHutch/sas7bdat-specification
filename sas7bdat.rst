@@ -928,32 +928,32 @@ In RLE, the compressed row data is a series of control bytes, each optionally fo
 The control byte specifies how the data bytes are interpreted, or is self contained.
 The control byte has 2 parts - the upper 4 bits are the Command, and the lower 4 bits are the Length.
 Each is an uint in the range 0-15.
-For example, control byte 82 (hex) is Command 8 and Length 2, and control byte F4 (hex) is command 15 (F hex) and Length 4.
+For example, control byte x82 is Command 8 and Length 2, and control byte xF4 is command 15 (xF) and Length 4.
 We have identified the functions of the 11 different Command values which are observed in the test files.
 The RLE structure was contributed by Clint Cummins.
 
 .. class:: rle-command-table
 
-======= ======  =============   ============================
-Command Length  Name            Function
-======= ======  =============   ============================
-0       0       Copy64          using the first byte as a uint length L (0-255), Copy the next N=64+L bytes from the input to the output (copies 64 to 319 bytes)
-1       ?       ?               *????????????*  (not observed in test files)
-2       ?       ?               *????????????*  (not observed in test files)
-3       ?       ?               *????????????*  (not observed in test files)
-4       L       InsertByte18    Insert N=18+L copies of the next byte in the output (inserts 18 to 33 bytes)
-5       ?       ?               *????????????*  (not observed in test files)
-6       0       InsertBlank17   using the first byte as a uint length L, Insert N=17+L blanks (decimal 32, hex 20) in the output (inserts 17 to 273 blanks)
-7       0       InsertZero17    using the first byte as a uint length L, Insert N=17+L zero bytes in the output
-8       L       Copy1           using the Length bits as a uint length L (0-15), Copy the next N=1+L bytes from the input to the output (copies 1 to 16 bytes)
-9       L       Copy17          Copy the next N=17+L bytes from the input to the output (copies 17 to 32 bytes)
-10 (A)  L       Copy33          Copy the next N=33+L bytes from the input to the output (copies 33 to 48 bytes)
-11 (B)  L       Copy49          Copy the next N=49+L bytes from the input to the output (copies 49 to 64 bytes)
-12 (C)  L       InsertByte3     Insert N=3+L copies of the next byte in the output (inserts 3 to 18 bytes)
-13 (D)  L       Insert@2        Insert N=2+L @ (decimal 64, hex 40) bytes in the output (inserts 2 to 17 @ bytes)
-14 (E)  L       InsertBlank2    Insert N=2+L blanks in the output
-15 (F)  L       InsertZero2     Insert N=2+L zero bytes in the output
-======= ======  =============   ============================
+=======     ======  =============   ============================
+Command     Length  Name            Function
+=======     ======  =============   ============================
+0           0       Copy64          using the first byte as a uint length L (0-255), Copy the next N=64+L bytes from the input to the output (copies 64 to 319 bytes)
+1           ?       ?               *????????????*  (not observed in test files)
+2           ?       ?               *????????????*  (not observed in test files)
+3           ?       ?               *????????????*  (not observed in test files)
+4           L       InsertByte18    Insert N=18+L copies of the next byte in the output (inserts 18 to 33 bytes)
+5           ?       ?               *????????????*  (not observed in test files)
+6           0       InsertBlank17   using the first byte as a uint length L, Insert N=17+L blank bytes (decimal 32, x20) in the output (inserts 17 to 273 blanks)
+7           0       InsertZero17    using the first byte as a uint length L, Insert N=17+L zero bytes in the output
+8           L       Copy1           using the Length bits as a uint length L (0-15), Copy the next N=1+L bytes from the input to the output (copies 1 to 16 bytes)
+9           L       Copy17          Copy the next N=17+L bytes from the input to the output (copies 17 to 32 bytes)
+10 (xA)     L       Copy33          Copy the next N=33+L bytes from the input to the output (copies 33 to 48 bytes)
+11 (xB)     L       Copy49          Copy the next N=49+L bytes from the input to the output (copies 49 to 64 bytes)
+12 (xC)     L       InsertByte3     Insert N=3+L copies of the next byte in the output (inserts 3 to 18 bytes)
+13 (xD)     L       Insert@2        Insert N=2+L ``@`` bytes (decimal 64, x40) in the output (inserts 2 to 17 ``@`` bytes)
+14 (xE)     L       InsertBlank2    Insert N=2+L blanks in the output
+15 (xF)     L       InsertZero2     Insert N=2+L zero bytes in the output
+=======     ======  =============   ============================
 
 The most common Commands in ``obs_all_perf_1.sas7bdat`` are F and 8 (alternating).
 This file is entirely 8 byte doubles, so the F commands often handle consecutive zero bytes in zero value doubles.
@@ -969,14 +969,14 @@ Compressed data row:
 
 ``Copy1              InsertZero2                 Ins Copy33 next 34 bytes``
 
-``Next 8 bytes       4 00h bytes                 2 40h``
+``Next 8 bytes       4 00h bytes                 2 x40``
 
 There are 5 Control Bytes (CB) in the above sequence.
 
 1. 87:  Copy1 next 8 bytes
-2. F2:  InsertZero2 4 00h bytes
+2. F2:  InsertZero2 4 x00 bytes
 3. 8A:  Copy1 next 11 bytes
-4. D0:  Insert@2 2 40h bytes
+4. D0:  Insert@2 2 x40 bytes
 5. A1:  Copy33 next 34 bytes
 
 Output uncompressed row:
@@ -997,7 +997,7 @@ Compressed data row:
 Control Bytes in Example 2:
 
 1. 87:  Copy1 next 8 bytes
-2. C1,99:  InsertByte3 4 99h bytes
+2. C1,99:  InsertByte3 4 x99 bytes
 3. A5:  Copy33 next 38 bytes
 
 Output uncompressed row:

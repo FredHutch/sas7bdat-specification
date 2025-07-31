@@ -8,3 +8,11 @@ To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/
 
 The repository has also been restructured to make the specification more prominent.
 The R code has been removed, which also means removing the code that downloads sample data.
+
+Style Guide
+-----------
+
+In order to allow contributions from multiple people but still have a specification that reads
+well, arbitrary choices must all be made the same way.
+
+Hexadecimal numbers must be represented with an x prefix.  For example, "x3F".
