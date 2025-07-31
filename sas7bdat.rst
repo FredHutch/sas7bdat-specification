@@ -799,7 +799,7 @@ By putting all of the numeric variables first, this alignment constraint can be 
 ======= =========   ======  ===================================================
 offset  length      conf.   description
 ======= =========   ======  ===================================================
-0       4|8         high    int, signature -4 (hex xFCFFFFFF|FCFFFFFFFFFFFFFF)
+0       4|8         high    int, signature -4 (xFCFFFFFF|xFCFFFFFFFFFFFFFF)
 4|8     2           medium  int, length of remaining subheader
 6|10    2           low     *????????????*
 8|12    2           low     *????????????*
@@ -849,7 +849,7 @@ The structure of column format pointers was contributed by Clint Cummins.
 ======= ======= ======  ===============================================
 offset  length  conf.   description
 ======= ======= ======  ===============================================
-0       4|8     high    int, signature -1026 (hex FEFB & 2 or 6 FFs)
+0       4|8     high    int, signature -1026 (xFEFBFFFF|xFEFBFFFFFFFFFF)
 4|8     12|16   low     *????????????*; zeros
 16|24   2       high    integer, the "width" portion of a column's FORMAT, or 0 if it has no FORMAT
 18|26   2       high    integer, the "digits" portion of a column's FORMAT, or 0 if it has no FORMAT
@@ -877,7 +877,7 @@ This subheader is not present in datasets which have only one column.
 ======= ======  ======  ===============================================
 offset  length  conf.   description
 ======= ======  ======  ===============================================
-0       4|8     high    int, signature -2 (hex FE & 3 or 7 FFs)
+0       4|8     high    int, signature -2 (xFEFFFFFF|xFEFFFFFFFFFFFFFF)
 4|8     2       medium  size of data in subheader; CL * 2 + MCL - 4|8
 6|10    6       low     *????????????*
 12|16   4|8     medium  int, length of remaining subheader
