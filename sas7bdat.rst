@@ -39,11 +39,10 @@ Introduction
 The SAS7BDAT file is a binary database storage file.
 At the time of this writing, no description of the SAS7BDAT file format was publicly available.
 Hence, users who wish to read and manipulate these files were required to obtain a license for the SAS software, or third party software with support for SAS7BDAT files.
-The purpose of this document is to promote interoperability between SAS and other popular statistical software packages, especially R (http://www.r-project.org/).
+The purpose of this document is to promote interoperability between SAS and non-commercial, open source software, especially R (http://www.r-project.org/).
 
 The information below was deduced by examining the contents of many SAS7BDAT databases downloaded freely from internet resources (see ``data/sas7bdat.sources.RData``).
 No guarantee is made regarding its accuracy.
-No SAS software, nor any other software requiring the purchase of a license was used.
 
 SAS7BDAT files consist of binary encoded data.
 Data files encoded in this format often have the extension '.sas7bdat'.
