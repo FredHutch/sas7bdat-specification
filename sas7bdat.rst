@@ -691,7 +691,7 @@ This text is mostly associated with columns, including the column names, labels,
 Some text is associated with the overall dataset, including the dataset label, type, and compression algorithm name.
 This subheader does not include information about the purpose of each string, or even where one string ends and the next one begins.
 Other subheaders (e.g. the `column name subheader`_) have `text reference`_ fields that refer to specific strings within this subheader.
-They provide the semantics of how each string is signficiant to the dataset.
+They provide the semantics of how each string is significant to the dataset.
 
 ======= ======  ======  ===============================================
 offset  length  conf.   description
