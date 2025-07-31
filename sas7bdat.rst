@@ -423,7 +423,7 @@ offset          length          conf.   description
 0               4               high    int, next `Page Sequence Number`_
 4               8|20            low     *????????????*
 12|24           4|8             low     number of unused bytes on page
-16|32           2               medium  int, bit field `page type`_ := _PGTYPE
+16|32           2               medium  int, bit field `page type`_ := PGTYPE
 18|34           2               medium  int, data block count := _`BC`
 20|36           2               medium  int, `subheader pointers`_ count := _`SC` <= `BC`_
 22|38           2               low     *????????????*
