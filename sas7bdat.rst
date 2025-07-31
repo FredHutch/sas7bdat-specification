@@ -216,7 +216,7 @@ Because `SAS7BDAT Packed Binary Data`_ may contain double precision values, it a
 Alignment of data structures according to the platform word length (4 bytes for 32 bit, and 8 bytes for 64 bit architectures) facilitates efficient operations on data stored in memory.
 It also suggests that parts of SAS7BDAT data file format are platform dependent.
 One theory is that the SAS implementation utilizes a common C or C++ structure or class to reference data stored in memory.
-When compiled, these structures are aligned according to the word length of the target platform. Of course, when SAS was originally written, platform differences may not have been forseeable.
+When compiled, these structures are aligned according to the word length of the target platform. Of course, when SAS was originally written, platform differences may not have been foreseeable.
 Hence, these inconsistencies may not have been intentional.
 
 Magic Number
@@ -530,7 +530,7 @@ A "_`subheader location`" field is composed of two integers, each 4|8 bytes long
 The first integer is the index of the page that has the subheader, with 1 indicating the page that immediately follows the file header.
 The second integer is the index of the subheader pointer within the page's subheader pointer table.
 A value of 1 indicates the subheader that is referred to by the first subheader pointer in the table, which is typically the last subheader physically on the page.
-Both values may be 0 to indicate that the referant subheader does not exist.
+Both values may be 0 to indicate that the referent subheader does not exist.
 
 A "_`text reference`" field is a pointer to a string of meta-information text, such as a variable name or a variable label.
 All meta-information text for a SAS7BDAT is held within a `Column Text subheader`_ and a "text reference" is the location of a string within those subheaders.
@@ -766,9 +766,9 @@ The column attribute subheader holds information regarding the column offsets wi
 The column attribute subheader sometimes occurs more than once (in test data).
 In these cases, column attributes are applied in the order they are parsed.
 
-Columns are not always pysically laid out within a row as they appear in the dataset.
+Columns are not always physically laid out within a row as they appear in the dataset.
 The numeric columns appear first and their relative order is preserved.
-This may be because reading numeric values is more efficent if they occur at offsets that are muliples of 8-bytes.
+This may be because reading numeric values is more efficient if they occur at offsets that are multiples of 8-bytes.
 By putting all of the numeric variables first, this alignment constraint can be accomplished without adding any padding between the variables.
 
 
@@ -1019,7 +1019,7 @@ size      bytes  sign  exponent  mantissa  ``M``
 Dates, Currency, and Formatting
 -------------------------------
 
-Column formatting infomation is encoded within the `Column Text Subheader`_ and `Column Format and Label Subheader`_.
+Column formatting information is encoded within the `Column Text Subheader`_ and `Column Format and Label Subheader`_.
 Columns with formatting information have special meaning and interpretation.
 For example, numeric values may represent dates, encoded as the number of seconds since midnight, January 1, 1960.
 The format string for fields encoded this way is "DATETIME".
@@ -1145,4 +1145,4 @@ ToDo
 - determine purpose and pattern of 'page sequence signature' fields.  Are they useful?
 - identify how non-ASCII encoding is specified
 - implement R options to read just header (and subheader) information without data, and an option to read just some data fields, and not all fields.
-  [The TSP implemenation already does this, and can also read a subset of the data rows.]
+  [The TSP implementation already does this, and can also read a subset of the data rows.]
