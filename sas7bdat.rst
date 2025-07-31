@@ -929,7 +929,7 @@ The control byte specifies how the data bytes are interpreted, or is self contai
 The control byte has 2 parts - the upper 4 bits are the Command, and the lower 4 bits are the Length.
 Each is an uint in the range 0-15.
 For example, control byte x82 is Command 8 and Length 2, and control byte xF4 is command 15 (xF) and Length 4.
-We have identified the functions of the 11 different Command values which are observed in the test files.
+We have identified the functions of the 12 different Command values which are observed in the test files.
 The RLE structure was contributed by Clint Cummins.
 
 .. class:: rle-command-table
