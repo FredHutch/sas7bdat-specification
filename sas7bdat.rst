@@ -480,7 +480,8 @@ offset  length  conf.   description
 12|24           high    Total length of subheader pointer 12|24 (**u64**), SL
 ======= ======  ======  ===============================================
 
-When COMP=1, the subheader pointer should be ignored.  In this case QL is usually 0.
+When COMP=1, the subheader pointer should be ignored.
+In this case QL is usually 0.
 From observation, the final subheader pointer on a page always has COMP=1.
 This may be used to indicate the end of the subheader pointers array.
 
@@ -839,7 +840,8 @@ Column List Subheader
 ---------------------
 
 The purpose of this subheader is not clear. But the structure is partly identified.
-Information related to this subheader was contributed by Clint Cummins.  ``eyecarex.sas7bdat`` (created by Stat/Transfer) does not have this subheader.
+Information related to this subheader was contributed by Clint Cummins.
+``eyecarex.sas7bdat`` (created by Stat/Transfer) does not have this subheader.
 
 This subheader is not present in datasets which have only one column.
 
