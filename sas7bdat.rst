@@ -638,7 +638,8 @@ Subheader Counts Subheader
 --------------------------
 
 This subheader contains information on the first and last appearances of at least 7 common subheader types.
-Any of these subheaders may appear once or more. Multiple instances of a subheader provide information for an exclusive subset of columns.
+Any of these subheaders may appear once or more.
+Multiple instances of a subheader provide information for an exclusive subset of columns.
 The order in which data is read from multiple subheaders corresponds to the reading order (left to right) of columns.
 The structure of this subheader was deduced and reported by Clint Cummins.
 
