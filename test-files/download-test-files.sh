@@ -6,6 +6,6 @@
 while IFS= read -r url; do
     # Download the dataset
     echo "Downloading $url"
-    curl --silent --show-error "$url" > $(basename $url)
+    curl --silent --show-error --remote-name --fail-with-body "$url"
 
 done < data-file-urls.txt
