@@ -15,6 +15,12 @@ styles:
     parent: table
     colWidths: [ 2cm, 1.5cm, 3cm, null, null ]
 
+  # Without a style, the long descriptions in the "ST table" causes the "ST" header to have
+  # a line break between the "S" and the "T".
+  st-table:
+    parent: table
+    colWidths: [ 1cm, null ]
+
   # Without a style, the long descriptions in the Run-Length-Encoding table causes
   # the Command column to be given too little space.
   rle-command-table:

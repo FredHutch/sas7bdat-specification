@@ -503,6 +503,8 @@ This may be used to indicate the end of the subheader pointers array.
 The subheaders with ST=0 have fixed size and the subheaders with ST=1 have a variable size.
 All subheaders with ST=1 have an integer at offset 4|8 that is 4|8 bytes long whose value is the size of the subheader minus the size of the signature and the padding at the end of the subheader.
 
+.. class:: st-table
+
 ====    ============
 ST      subheaders
 ====    ============
