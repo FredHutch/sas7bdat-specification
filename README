@@ -19,9 +19,10 @@ Hexadecimal numbers must be represented with an x prefix. For example, "x3F".
 
 When a term has many synonyms or alternate spellings, a single, preferred term is used consistently:
 
-| Preferred Term | Notes                        |
-|----------------|------------------------------|
-| dataset        | Not "data set" or "database" |
+| Preferred Term   | Notes                         |
+|------------------|-------------------------------|
+| dataset          | Not "data set" or "database"  |
+| meta-information | Not "metadata" or "meta-data" |
 
 Data Files
 -----------
