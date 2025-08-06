@@ -29,5 +29,5 @@ The specification was reverse-engineered by examining free SAS7BDAT files found 
 These datasets may not be public domain, so they cannot be included in this project.
 Instead, you can download them yourself.
 
-cd test-files
-./download-test-files.sh
+    cd test-files
+    ./download-test-files.sh
