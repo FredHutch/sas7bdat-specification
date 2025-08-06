@@ -41,7 +41,7 @@ At the time of this writing, no description of the SAS7BDAT file format was publ
 Hence, users who wish to read and manipulate these files were required to obtain a license for the SAS software, or third party software with support for SAS7BDAT files.
 The purpose of this document is to promote interoperability between SAS and non-commercial, open source software, especially R (http://www.r-project.org/).
 
-The information below was deduced by examining the contents of many SAS7BDAT dataset downloaded freely from internet resources (see ``data/sas7bdat.sources.RData``).
+The information in this specification was deduced by inspecting a variety of SAS7BDAT datasets downloaded freely from the Internet (see ``test-files/data-file-urls.txt``).
 No guarantee is made regarding its accuracy.
 
 SAS7BDAT files consist of binary encoded data.
@@ -50,7 +50,7 @@ The name 'SAS7BDAT' is not official, but is used throughout this document to ref
 
 There are significant differences in the SAS7BDAT format depending on the operating systems and computer hardware platforms (32bit vs. 64bit).
 See the section on `platform differences`_ for more details.
-The format described below is sufficient to read the entire collection of test files referenced in ``data/sas7bdat.sources.RData`` (i.e. files associated with 32bit and some 64bit builds of SAS for Microsoft Windows, and **u64** SAS versions).
+The format described below is sufficient to read the entire collection of test files referenced in ``test-files/data-file-urls.txt`` (i.e. files associated with 32bit and some 64bit builds of SAS for Microsoft Windows, and **u64** SAS versions).
 This includes files created with COMPRESS=CHAR.
 
 The figure below illustrates the overall structure of a SAS7BDAT file.
@@ -175,7 +175,7 @@ In particular:
 4. The byte at offset 39 appears to distinguish the OS type, where '1' indicates that the file was generated on a UNIX-like system, such as Linux or SunOS, and '2' indicates the file was generated on a Microsoft Windows platform. However, this does not affect any important fields in the file format.
 
 The following table describes some of the possible polymorphisms for the 8 bytes at offset 32.
-The first field lists the name of the file where the sequence was found (see ``data/sas7bdat.sources.RData``), the second lists the eight byte values (hexadecimal), the third field shows bytes 216-239 in ASCII ('.' represents a non-ASCII character or '\0'), and the fourth field lists the SAS7BDAT sub-format.
+The first field lists the name of the file where the sequence was found (see the ``test-files`` directory), the second lists the eight byte values (hexadecimal), the third field shows bytes 216-239 in ASCII ('.' represents a non-ASCII character or '\0'), and the fourth field lists the SAS7BDAT sub-format.
 
 =========================== =================================== ============================ ======================
 filename                    bytes 32-39                         bytes 216-239                sub-format
@@ -230,15 +230,14 @@ The SAS7BDAT magic number is the following 32 byte (hex) sequence::
    xb3 x14 x11 xcf   xbd x92 x08 x00
    x09 xc7 x31 x8c   x18 x1f x10 x11
 
-In all test files except one (not listed in ``data/sas7bdat.sources.RData``), the magic number above holds.
-The one anomalous file has the following magic number::
+There is one anomalous file, which has the following magic number::
 
    x00 x00 x00 x00   x00 x00 x00 x00
    x00 x00 x00 x00   x00 x00 x00 x00 
    x00 x00 x00 x00   x00 x00 x00 x00 
    x00 x00 x00 x00   x18 x1f x10 x11
 
-In addition, the anomalous file is associated with the SAS release "3.2TK".
+The anomalous file is associated with the SAS release "3.2TK".
 Indeed, this file may not have been written by SAS.
 Otherwise, the anomalous file appears to be formatted similarly to other test files.
 
@@ -1079,7 +1078,7 @@ The bits are packed such that a single byte describes the deleted status of eigh
 Platform Differences
 ====================
 
-The test files referenced in ``data/sas7bdat.sources.RData`` were examined over a period of time.
+The test files referenced by ``test-files/data-file-urls.txt`` were examined over a period of time.
 Files with non-Microsoft Windows markings were only observed late into the writing of this document.
 Consequently (but not intentionally), the SAS7BDAT description above was first deduced for SAS datasets generated on the most commonly observed platform: Microsoft Windows.
 The extensions to SAS7BDAT files for **u64** and non-Intel formats was contributed a little later by Clint Cummins.
@@ -1120,7 +1119,7 @@ filename                            format features
 Compression Data
 ================
 
-The table below presents the results of compression tests on a collection of 142 SAS7BDAT data files (sources in ``data/``).
+The table below presents the results of compression tests on a collection of 142 SAS7BDAT dataset found on the Internet.
 The 'type' field represents the type of compression, 'ctime' is the compression time (in seconds), 'dtime' is the decompression time, and the 'compression ratio' field holds the cumulative disk usage (in megabytes) before and after compression.
 Although the ``xz`` algorithm requires significantly more time to compress these data, the decompression time is on par with gzip.
 
