@@ -1,5 +1,5 @@
 ===============================
-SAS7BDAT Database Binary Format
+SAS7BDAT File Format
 ===============================
 
 by:
@@ -36,24 +36,24 @@ Contents
 Introduction
 ============
 
-The SAS7BDAT file is a binary database storage file.
+The SAS7BDAT file format is a binary format that SAS uses to store datasets.
 At the time of this writing, no description of the SAS7BDAT file format was publicly available.
 Hence, users who wish to read and manipulate these files were required to obtain a license for the SAS software, or third party software with support for SAS7BDAT files.
 The purpose of this document is to promote interoperability between SAS and non-commercial, open source software, especially R (http://www.r-project.org/).
 
-The information below was deduced by examining the contents of many SAS7BDAT databases downloaded freely from internet resources (see ``data/sas7bdat.sources.RData``).
+The information below was deduced by examining the contents of many SAS7BDAT dataset downloaded freely from internet resources (see ``data/sas7bdat.sources.RData``).
 No guarantee is made regarding its accuracy.
 
 SAS7BDAT files consist of binary encoded data.
 Data files encoded in this format often have the extension '.sas7bdat'.
-The name 'SAS7BDAT' is not official, but is used throughout this document to refer to SAS database files formatted according to the descriptions below.
+The name 'SAS7BDAT' is not official, but is used throughout this document to refer to SAS dataset files formatted according to the descriptions below.
 
 There are significant differences in the SAS7BDAT format depending on the operating systems and computer hardware platforms (32bit vs. 64bit).
 See the section on `platform differences`_ for more details.
 The format described below is sufficient to read the entire collection of test files referenced in ``data/sas7bdat.sources.RData`` (i.e. files associated with 32bit and some 64bit builds of SAS for Microsoft Windows, and **u64** SAS versions).
 This includes files created with COMPRESS=CHAR.
 
-The figure below illustrates the overall structure of the SAS7BDAT database.
+The figure below illustrates the overall structure of a SAS7BDAT file.
 Each file consists of a header (length := HL bytes), followed by PC pages, each of length PL bytes (PC and PL are shorthand for 'page count' and 'page size' respectively, and are used to denote these quantities throughout this document)::
 
   ----------
@@ -74,7 +74,7 @@ For example, see the below `table of hexadecimal, decimal, and binary values`_.
 SAS7BDAT Header
 ===============
 
-The SAS7BDAT file header contains a binary file identifier (*i.e.*, a magic number), the dataset name, timestamp, the number pages (PC), their size (PL) and a variety of other values that pertain to the database as a whole.
+The SAS7BDAT file header contains a binary file identifier (*i.e.*, a magic number), the dataset name, timestamp, the number pages (PC), their size (PL) and a variety of other values that pertain to the dataset as a whole.
 The purpose of many header fields remain unknown, but are likely to include specifications for data compression and encryption, password protection, and dates/times of creation and/or modification.
 Most files encountered encode multi-byte values little-endian (least significant byte first).
 However, some files have big-endian values.
@@ -457,7 +457,7 @@ Hence, if the two bytes are interpreted as an unsigned integer, then the 'meta',
 However, the pattern is unclear.
 
 If a page has meta-information, then it is of type 'meta', 'mix', or 'amd' and beginning at offset byte 24|40 are a sequence of SC SL-byte `subheader pointers`_, which point to an offset farther down the page, starting at the end of the page and moving backward.
-`SAS7BDAT Subheaders`_ stored at these offsets hold meta-information about the database, including the column names, labels, and types.
+`SAS7BDAT Subheaders`_ stored at these offsets hold meta-information about the dataset, including the column names, labels, and types.
 
 If a page has data, then it is of type 'mix' or 'data'.
 In page of type 'mix', packed binary data **begins at the next 8 byte boundary following the last subheader pointer**.
@@ -516,7 +516,7 @@ ST      subheaders
 SAS7BDAT Subheaders
 ===================
 
-Subheaders contain meta-information regarding the SAS7BDAT database, including row and column counts, column names, labels, and types.
+Subheaders contain meta-information regarding the SAS7BDAT dataset, including row and column counts, column names, labels, and types.
 Each subheader is associated with a four- or eight-byte 'signature' (**u64**) that identifies the subheader type, and hence, how it should be parsed.
 
 Some subheaders types may appear more than once.  The `Column Format subheader` is repeated once per variable.

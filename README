@@ -13,9 +13,15 @@ Style Guide
 -----------
 
 In order to allow contributions from multiple people but still have a specification that reads
-well, arbitrary choices must all be made the same way.
+well, arbitrary choices in style must all be made the same way.
 
-Hexadecimal numbers must be represented with an x prefix.  For example, "x3F".
+Hexadecimal numbers must be represented with an x prefix. For example, "x3F".
+
+When a term has many synonyms or alternate spellings, a single, preferred term is used consistently:
+
+| Preferred Term | Notes                        |
+|----------------|------------------------------|
+| dataset        | Not "data set" or "database" |
 
 Data Files
 -----------
@@ -23,5 +29,5 @@ The specification was reverse-engineered by examining free SAS7BDAT files found 
 These datasets may not be public domain, so they cannot be included in this project.
 Instead, you can download them yourself.
 
-   cd test-files
-   ./download-test-files.sh
+cd test-files
+./download-test-files.sh
