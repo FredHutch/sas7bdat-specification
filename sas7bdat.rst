@@ -638,10 +638,21 @@ offset  length  conf.   description
 Subheader Counts Subheader
 --------------------------
 
-This subheader contains information on the first and last appearances of at least 7 common subheader types.
-Any of these subheaders may appear once or more.
-Multiple instances of a subheader provide information for an exclusive subset of columns.
+The Subheader Counts subheader contains information about the variable-size subheaders within the dataset.
+
+All variable-size subheaders have a "payload size" field at offset 4|8, just after the subheader signature.
+The payload size is the number of bytes in the subheader without including the signature or padding at the end.
+The field at offset 4|8 in the Subheader Counts subheader is the maximum value of all payload sizes.
+This might be useful to a reader that wants to preallocate space to hold the data.
+
+Every variable-sized subheader type may appear one or more times.
+When they appear more than once, all subheaders of that type are adjacent.
+The vectored part of the Subheader Counts subheader describes the location of the first and last appearance of each variable-sized subheader type.
+
+The variable-size subheader types provide information about specific columns.
+When a subheader type appears more than once, each one provides information for an exclusive subset of columns.
 The order in which data is read from multiple subheaders corresponds to the reading order (left to right) of columns.
+
 The structure of this subheader was deduced and reported by Clint Cummins.
 
 .. class:: offset-table
@@ -650,10 +661,10 @@ The structure of this subheader was deduced and reported by Clint Cummins.
 offset      length  conf.   description
 =========   ======= ======  ===============================================
 0           4|8     high    int, signature -1024 (x00FCFFFF|x00FCFFFFFFFFFFFF)
-4|8         4|8     low     int, length or offset, usually >= 48
-8|16        4|8     low     int, usually 4
-12|24       2       low     int, usually 7 (number of nonzero SCVs?)
-14|26       50|94   low     *????????????*
+4|8         4|8     medium  int, the max payload size of all variable-size subheaders, as reported at their offset 4|8
+8|16        4|8     medium  int, the number of subheader count vectors with a non-zero appearance (usually 4)
+12|24       4|8     medium  int, the number of subheader count vectors with a non-zero signature
+16|32       50|88   low     *????????????*
 64|120      12*LSCV medium  12 `subheader count vectors`_, length := LSCV = 20|40 bytes each
 304|600             medium  Total length of subheader, QL
 =========   ======= ======  ===============================================
@@ -661,7 +672,7 @@ offset      length  conf.   description
 Subheader Count Vectors
 +++++++++++++++++++++++
 
-The subheader count vectors encode information for each of 4 common subheader types, and potentially 12 total subheader types.
+The subheader count vectors encode information for 4 known subheader types, 3 unknown types, and potentially 12 total subheader types.
 
 .. class:: offset-table
 
@@ -682,22 +693,23 @@ The variable `NCT`_ in the `Row Size Subheader`_ should be used to ensure that a
 
 The first 7 binary signatures in the `Subheader Count Vectors`_ array are always:
 
-=================== ====================
-subheader signature description
-=================== ====================
+=================== ======================
+Subheader Signature Subheader Type
+=================== ======================
 -4                  Column Attributes
 -3                  Column Text
--1                  Column Names
+-1                  Column Name
 -2                  Column List
--5                  unknown signature #1
--6                  unknown signature #2
--7                  unknown signature #3
-=================== ====================
+-5                  *unknown signature #1*
+-6                  *unknown signature #2*
+-7                  *unknown signature #3*
+=================== ======================
 
 The remaining 5 out of 12 signatures are zeros in the observed source files.
 Presumably, these are for subheaders not yet defined, or not present in the collection of test files.
 
-A `Column Format and Label subheader`_ may appear on multiple pages, but are not indexed in Subheader Counts.
+Note that a `Column Format and Label subheader`_ may appear multiple times, but these subheaders have a fixed size and are therefore not indexed in Subheader Counts.
+
 The variables NCFL1 and NCFL2 in the `Row Size subheader`_ may be helpful if you want to know in advance if these appear across multiple pages.
 
 
