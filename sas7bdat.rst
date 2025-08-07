@@ -599,7 +599,7 @@ offset      length      conf.   description
 356|684     6           medium  A `text reference`_ to the dataset type, also called Creator Software := CSTR
 362|690     6           low     zeroes, possibly a `text reference`_ to something that is the empty string in all test data files
 368|696     6           low     three two-byte integers: usually <12, 8, 0>.  Possibly a `text reference`_ to the second entry in the first Column Text subheader.
-376|702     6           low     A `text reference`_ to the Creator PROC step name := CPTR
+374|702     6           low     A `text reference`_ to the Creator PROC step name := CPTR
 382|710     34          low     zeroes
 416|744     2           low     int, value 4
 418|746     2           low     int, value 1
