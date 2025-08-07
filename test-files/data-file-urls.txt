@@ -44,6 +44,9 @@ https://raw.githubusercontent.com/icimaciej/datasets/main/bostonhousing.sas7bdat
 https://raw.githubusercontent.com/icimaciej/datasets/main/college.sas7bdat
 https://raw.githubusercontent.com/icimaciej/datasets/main/crime.sas7bdat
 https://raw.githubusercontent.com/icimaciej/datasets/main/labs.sas7bdat
+https://raw.githubusercontent.com/reikoch/testfiles/master/dates.sas7bdat
+https://raw.githubusercontent.com/reikoch/testfiles/master/dates_binary.sas7bdat
+https://raw.githubusercontent.com/reikoch/testfiles/master/dates_char.sas7bdat
 https://datavis.ca/gallery/guerry/maps/gfrance.sas7bdat
 https://datavis.ca/gallery/guerry/maps/gfrance2.sas7bdat
 https://datavis.ca/gallery/guerry/maps/xfrance.sas7bdat
