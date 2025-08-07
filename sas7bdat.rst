@@ -577,7 +577,7 @@ offset      length      conf.   description
 36|72       4|8         medium  int, number of `Column Format and Label Subheader`_ on first page where they appear := _`NCFL1`
 40|80       4|8         medium  int, number of `Column Format and Label Subheader`_ on second page where they appear (or 0) := _`NCFL2`
 44|88       4|8         medium  Sum of the size of the payload of all `Column List Subheader`_ (subheader size - 28)
-48|92       4|8         medium  Sum of the length of all variable names
+48|96       4|8         medium  Sum of the length of all variable names
 52|104      4|8         medium  int, page size, equals PL
 56|112      4|8         low     *????????????*; x00 has been observed on **u64**
 60|120      4|8         medium  int, max possible row count on "mix" page := _`MRC`.  This may be larger than the actual number of rows on the mix page.
