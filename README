@@ -17,6 +17,8 @@ well, arbitrary choices in style must all be made the same way.
 
 Hexadecimal numbers must be represented with an x prefix. For example, "x3F".
 
+Dates are expressed according to RFC-3339. For example, "1960-01-01T00:00:00" is the SAS Epoch.
+
 When a term has many synonyms or alternate spellings, a single, preferred term is used consistently:
 
 | Preferred Term   | Notes                         |

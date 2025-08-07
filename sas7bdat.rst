@@ -144,8 +144,8 @@ offset          length  conf.   description
 92              64      high    ascii, dataset name
 156             8       medium  ascii, file type, e.g. ``'DATA    '``
 164             a1      medium  zero padding when a1=4.  Aligns the double timestamps below on double word boundaries.
-164+a1          8       high    double, timestamp, date created, secs since 1/1/60 (for SAS version 8.x and higher)
-172+a1          8       high    double, timestamp, date modified, secs since 1/1/60 (for SAS version 8.x and higher)
+164+a1          8       high    double, timestamp, date created, seconds since 1960-01-01T00:00:00 (for SAS version 8.x and higher)
+172+a1          8       high    double, timestamp, date modified, seconds since 1960-01-01T00:00:00 (for SAS version 8.x and higher)
 180+a1          8       low     *????????????*
 188+a1          8       low     *????????????*, repeat of of 180+a1:188+a1
 196+a1          4       high    int, length of SAS7BDAT header := HL
@@ -585,9 +585,9 @@ offset      length      conf.   description
 72|144      148|296     medium  zeroes
 220|440     4           low     int, initial `Page Sequence Number`_ (equals value at offset 0 of first page)
 224|444     28|44       low     zeroes
-252|488     4|8         medium  zero usually, or 1 if dataset has processed with a PROC DATASETS REPAIR statement
-256|496     4|8         medium  zero usually, or a timestamp if the dataset was processed with a PROC DATASETS REPAIR statement
-260|504     4|8         medium  zero usually, or a timestamp if the dataset was processed with a PROC DATASETS REPAIR statement
+???|488     ?|8         high    int, number of times the dataset has processed with a PROC DATASETS REPAIR statement.
+???|496     8           high    double, timestamp, seconds since 1960-01-01T00:00:00 UTC when the dataset was most recently processed with a PROC DATASETS REPAIR statement; zero if never.
+???|504     8           high    double, timestamp, seconds since 1960-01-01T00:00:00 in the local time zone when the dataset was most recently processed with a PROC DATASETS REPAIR statement; zero if never.
 264|512     8|16        low     two 4|8 byte integer values 1, 2 observed.  May be the `subheader location`_ of the first `Column Size Subheader`_
 272|528     8|16        medium  two 4|8 byte integer values, a `subheader location`_ of the final subheader that isn't truncated (COMP is not 1)
 280|544     8|16        medium  two 4|8 byte integer values that indicate the location of the first row of data.  This is like a `subheader location` in that the first integer is a page index and the second one is "block" index.  The integers are 0 and 3 if the dataset has no rows (TRC=0).  If the first row is on a 'mix' page, then the second integer the number of subheaders on the page plus 1.  Otherwise, the values are the index of the first 'data' page and 1.
