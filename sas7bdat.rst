@@ -612,7 +612,7 @@ offset      length      conf.   description
 444|776     4|8         medium  TRC, repeated
 448|784     19|11       low     zeroes
 467|795     1           low     int, bit field, values 1,5
-468|796     12          low	zeroes
+468|796     12          low     zeroes
 480|808                 medium  Total length of subheader, QL
 =========   =========   ======  ===============================================
 
