@@ -594,12 +594,12 @@ offset      length      conf.   description
 288|560     8|16        medium  two 4|8 byte integer values that indicate the location of the final row of data.  The integers are 0 and 3 if the dataset has no rows (TRC=0).  If the final row is on a 'mix' page, then the second integer is the number of subheaders on the page plus the number of rows (TRC).  Otherwise, the values are the index of the final 'data' page and the number of rows on that page.
 296|576     8|16        medium  the `subheader location`_ of the first `Column Format and Label subheader`_
 304|592     40|80       low     zeroes
-344|672     6           low     three two-byte integers: usually <0, 0|8, 4>.  This may be a `text reference`_ to the compression string.
+344|672     6           low     three two-byte integers: usually <0, 0|8, 4>.  This may be a `text reference`_ to the first four bytes in the first Column Text subheader, which are usually all x00.
 350|678     6           high    A `text reference`_ to the dataset label
 356|684     6           medium  A `text reference`_ to the dataset type, also called Creator Software := CSTR
 362|690     6           low     zeroes, possibly a `text reference`_ to something that is the empty string in all test data files
-368|696     6           low     three two-byte integers: usually <12, 8, 0>.  Possibly a `text reference`_ to the second entry in the first Column Text subheader.
-374|702     6           low     A `text reference`_ to the Creator PROC step name := CPTR
+368|696     6           high    A `text reference`_ to the `Compression Method`_
+374|702     6           low     A `text reference`_ to the Creator PROC step name
 382|710     34          low     zeroes
 416|744     2           low     int, value 4
 418|746     2           low     int, value 1
@@ -743,16 +743,6 @@ This subheader sometimes appears more than once; each is a separate array.
 The "subheader index" component of a `text reference`_ selects a particular text array.
 
 The offset of a text reference is always a multiple of 4, so the strings within this subheader often end with a few bytes of value x00 for padding.
-
-The variables CSTR and CPTR from the `Row Size subheader`_ are each a `text reference`_ to strings at the start of the first Column Text subheader (before the column name strings).
-These text fields also contains compression information.
-The following logic decodes these strings:
-
-1. Set LCS=length of CSTR, LCP=length of CPTR
-2. If the first 8 bytes of the field are blank, file is not compressed, and set LCS=0.  The Creator PROC step name is the LCR bytes starting at offset 16.
-3. If LCS > 0 (still), the file is not compressed, the first LCS bytes are the Creator Software string (padded with nulls).  Set LCP=0.  Stat/Transfer files use this pattern.
-4. If the first 8 bytes of the field are ``SASYZCRL``, the file is compressed with Run Length Encoding.  The Creator PROC step name is the LCP bytes starting at offset 24.
-5. If the first 8 bytes are nonblank and options 2 or 3 above are not used, this probably indicates COMPRESS=BINARY.  We need test files to confirm this, though.
 
 Column Name Subheader
 ---------------------
@@ -933,6 +923,18 @@ The final subheader on a page is usually COMP=1, which indicates a truncated row
 
 The SAS option COMPRESS=BINARY apparently uses a RDC (Ross Data Compression) structure instead of RLE.
 We need more test files to investigate this structure, and only document RLE at present.
+
+Compression Method
+++++++++++++++++++
+
+The compression method is eight bytes long and is always placed four bytes into the text array in the first `Column Text subheader`_.
+The location of this string is given in the `Row Size subheader`_.
+
+If the Compression Method is the empty string (length and offset in the text pointer are zero), then the file is not compressed.
+
+If the Compression Method is ``SASYZCRL``, then compressed subheaders use Run Length Encoding.
+
+If the Compression Method is ``SASYZCR2``, then compressed subheaders use binary (Ross Data Compression) encoding.
 
 Run Length Encoding
 +++++++++++++++++++
