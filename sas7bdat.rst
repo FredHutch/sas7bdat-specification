@@ -1076,13 +1076,15 @@ The format string for fields encoded this way is "DATETIME".
 Using R, these values may be converted using the as.POSIXct or as.POSIXlt functions with argument ``origin="1960-01-01"``.
 The most common date format strings correspond to numeric fields, and are interpreted as follows:
 
-========  =======================================  ============
-Format    Interpretation                           R Function
-========  =======================================  ============
-DATE      Number of days since January 1, 1960     chron::chron
-TIME      Number of seconds since midnight         as.POSIXct
-DATETIME  Number of seconds since January 1, 1960  as.POSIXct
-========  =======================================  ============
+.. class:: date-time-format-table
+
+========  ===================================================   ============
+Format    Interpretation                                        R Function
+========  ===================================================   ============
+DATE      Number of days since January 1, 1960                  chron::chron
+TIME      Number of seconds since midnight                      as.POSIXct
+DATETIME  Number of seconds since midnight on January 1, 1960   as.POSIXct
+========  ===================================================   ============
 
 There are many additional format strings for numeric and character fields.
 

@@ -26,3 +26,9 @@ styles:
   rle-command-table:
     parent: table
     colWidths: [ 2.5cm, 1.75cm, 3cm, null, null ]
+
+  # Without a style, the long "Interpretations" in the Inter table causes
+  # the "Format" column to wrap.
+  date-time-format-table:
+    parent: table
+    colWidths: [ 2.5cm, null, 3cm ]
