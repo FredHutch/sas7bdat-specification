@@ -1206,7 +1206,6 @@ ToDo
 - obtain test files which use COMPRESS=BINARY, and develop identification and uncompression procedures
 - obtain test files with more than 2.1 billion (and more than 4.2 billion) data rows, i.e. where 8 byte integer TRC in **u64** is apparently needed.
   Do the non-u64 files handle this, with additional fields beyond the 4 byte TRC used for segmentation?  Is TRC a (signed) int or (unsigned) uint?
-- identify any SAS7BDAT encryption flag (this is not the same as 'cracking', or breaking encryption); we just identify if a file is encrypted and not readable without a key
 - experiment further with 'amendment page' concept
 - consider header bytes -by- SAS_host
 - check that only one page of type "mix" is observed.
@@ -1214,5 +1213,4 @@ ToDo
   [May not be needed, because the BC and SC fields in each Page Offset Table make the `MRC`_ field in the initial header unnecessary.]
 - identify purpose of various unknown header quantities
 - determine purpose of Column List subheader
-- determine purpose and pattern of 'page sequence signature' fields.  Are they useful?
-- identify how non-ASCII encoding is specified
+- determine pattern of the 'page sequence number' fields.
