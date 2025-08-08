@@ -1049,7 +1049,8 @@ In SAS7BDAT file, numeric quantities can be 3, 4, 5, 6, 7, or 8 bytes in length.
 For numeric quantities of less than 8 bytes, the remaining number of bytes are truncated from the least significant part of the mantissa.
 Hence, the minimum and maximum numeric values are identical for all byte lengths, but shorter numeric values have reduced precision.
 
-Reduction in precision is characterized by the largest integer such that itself and all smaller integers have an exact representation, denoted ``M``. At best, all integers greater than ``M`` are approximated to the nearest multiple of ``b``.
+Reduction in precision is characterized by the largest integer such that itself and all smaller integers have an exact representation, denoted ``M``.
+At best, all integers greater than ``M`` are approximated to the nearest multiple of ``b``.
 The table of `numeric binary formats`_ below lists ``M`` values and describes how bits are distributed among the six possible column widths in SAS7BDAT files, and lists.
 
 Numeric Binary Formats
