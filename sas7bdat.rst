@@ -1066,6 +1066,54 @@ size      bytes  sign  exponent  mantissa  ``M``
 64bit     8      1     11        52        9007199254740990
 =====     =====  ====  ========  ========  ================
 
+Missing Values
+--------------
+
+SAS supports multiple of ways of specifying that a numeric value is missing from an observation.
+This can be used to encode *why* a value is missing.
+For example, this could be used to distinguish between when a value was not collected, when it's below the measurable range, or when it's above the measurable range.
+
+The standard missing value is represented in SAS by a dot (``.``).
+Alternative missing values are denoted by a dot followed by an underscore (``._``) or a dot followed by a letter (for example, ``.A``).
+
+The encodings of missing values in a SAS7BDAT file are given by the table below.
+Note that on platforms with a little-endian byte order, the bytes appear reverse order in the SAS7BDAT file.
+As mentioned above, for variables whose size is less than 8 bytes, the least significant part of the mantissa are omitted.
+These are the x00 bytes.
+
+==================  =====================================
+SAS Missing Value   IEEE 754 Encoding
+==================  =====================================
+``.``               x00 x00 x00 x00 x00 **xFE** 0xFF 0xFF
+``._``              x00 x00 x00 x00 x00 **xFF** 0xFF 0xFF
+``.A``              x00 x00 x00 x00 x00 **xFD** 0xFF 0xFF
+``.B``              x00 x00 x00 x00 x00 **xFC** 0xFF 0xFF
+``.C``              x00 x00 x00 x00 x00 **xFB** 0xFF 0xFF
+``.D``              x00 x00 x00 x00 x00 **xFA** 0xFF 0xFF
+``.E``              x00 x00 x00 x00 x00 **xF9** 0xFF 0xFF
+``.F``              x00 x00 x00 x00 x00 **xF8** 0xFF 0xFF
+``.G``              x00 x00 x00 x00 x00 **xF7** 0xFF 0xFF
+``.H``              x00 x00 x00 x00 x00 **xF6** 0xFF 0xFF
+``.I``              x00 x00 x00 x00 x00 **xF5** 0xFF 0xFF
+``.J``              x00 x00 x00 x00 x00 **xF4** 0xFF 0xFF
+``.K``              x00 x00 x00 x00 x00 **xF3** 0xFF 0xFF
+``.L``              x00 x00 x00 x00 x00 **xF2** 0xFF 0xFF
+``.M``              x00 x00 x00 x00 x00 **xF1** 0xFF 0xFF
+``.N``              x00 x00 x00 x00 x00 **xF0** 0xFF 0xFF
+``.O``              x00 x00 x00 x00 x00 **xEF** 0xFF 0xFF
+``.P``              x00 x00 x00 x00 x00 **xEE** 0xFF 0xFF
+``.Q``              x00 x00 x00 x00 x00 **xED** 0xFF 0xFF
+``.R``              x00 x00 x00 x00 x00 **xEC** 0xFF 0xFF
+``.S``              x00 x00 x00 x00 x00 **xEB** 0xFF 0xFF
+``.T``              x00 x00 x00 x00 x00 **xEA** 0xFF 0xFF
+``.U``              x00 x00 x00 x00 x00 **xE9** 0xFF 0xFF
+``.V``              x00 x00 x00 x00 x00 **xE8** 0xFF 0xFF
+``.W``              x00 x00 x00 x00 x00 **xE7** 0xFF 0xFF
+``.X``              x00 x00 x00 x00 x00 **xE6** 0xFF 0xFF
+``.Y``              x00 x00 x00 x00 x00 **xE5** 0xFF 0xFF
+``.Z``              x00 x00 x00 x00 x00 **xE4** 0xFF 0xFF
+==================  =====================================
+
 Dates, Currency, and Formatting
 -------------------------------
 
@@ -1191,7 +1239,6 @@ ToDo
 - check that only one page of type "mix" is observed.
   If so insert "In all test cases (``data/sources.csv``), there are exactly zero or one pages of type 'mix'." under the `Page Offset Table`_ header.
   [May not be needed, because the BC and SC fields in each Page Offset Table make the `MRC`_ field in the initial header unnecessary.]
-- identify all missing value representations: missing numeric values appear to be represented as '0000000000D1FFFF' (nan) for numeric 'double' quantities.
 - identify purpose of various unknown header quantities
 - determine purpose of Column List subheader
 - determine purpose and pattern of 'page sequence signature' fields.  Are they useful?
