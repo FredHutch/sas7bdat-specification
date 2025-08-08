@@ -606,8 +606,8 @@ offset      length      conf.   description
 416|744     2           low     int, value 4
 418|746     2           low     int, value 1
 420|748     2           medium  int, number of Column Text subheaders in file := _`NCT`
-422|750     2           medium  int, length of longest column name := MXNAM
-424|752     2           medium  int, length of longest column label := MXLAB
+422|750     2           medium  int, length of longest column name when 346|672 = 8; 0 when 346|674 = 0
+424|752     2           medium  int, length of longest column label when 346|672 = 8; 0 when 346|674 = 0
 426|754     12          low     zeroes
 438|766     2           medium  int, number of data rows on a full 'data' page: INT[8*(PL - 24|40)/(1+8 * RL_)] (the space on a page after the header, divided by the row length + 1 bit for each row's deleted flag, rounded down); 0 for compressed file
 440|768     4|8         low     zeroes
