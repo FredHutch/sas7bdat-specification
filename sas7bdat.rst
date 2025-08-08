@@ -915,11 +915,13 @@ Compressed Binary Data Subheader
 When a SAS7BDAT file is created by SAS with the option COMPRESS=CHAR or COMPRESS=YES, each row of data is compressed independently with a Run Length Encoding (RLE) structure.
 This yields a variable length compressed row.
 Each such row is stored in a single subheader in sequential order, indexed by the `subheader pointers`_.
-A RLE compressed data row is identified by COMP=4 in the subheader pointer, and does not have a subheader signature.
-If a particular row had highly variable data and yielded no compression, it is still stored in a subheader, but uncompressed with COMP=0 instead of COMP=4.
+A RLE compressed data row is identified by COMP=4 in the subheader pointer and does not have a subheader signature.
+If a particular row has highly variable data and yields no compression, it is still stored in a subheader but uncompressed with COMP=0 instead of COMP=4.
+
+The final subheader on a page is usually COMP=1, which indicates a truncated row to be ignored; the complete data row appears on the next page.
+
 The test file ``compress_yes.sas7bdat`` has such highly variable (random) data and all its rows are in this COMP=0 form of subheaders.
 It takes up more space than the uncompressed version ``compress_no.sas7bdat``, due to the extra length of the subheader pointers.
-The final subheader on a page is usually COMP=1, which indicates a truncated row to be ignored; the complete data row appears on the next page.
 
 The SAS option COMPRESS=BINARY apparently uses a RDC (Ross Data Compression) structure instead of RLE.
 We need more test files to investigate this structure, and only document RLE at present.
