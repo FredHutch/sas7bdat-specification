@@ -1051,7 +1051,7 @@ Hence, the minimum and maximum numeric values are identical for all byte lengths
 
 Reduction in precision is characterized by the largest integer such that itself and all smaller integers have an exact representation, denoted ``M``.
 At best, all integers greater than ``M`` are approximated to the nearest multiple of ``b``.
-The table of `numeric binary formats`_ below lists ``M`` values and describes how bits are distributed among the six possible column widths in SAS7BDAT files, and lists.
+The table of `numeric binary formats`_ below lists ``M`` values and describes how bits are distributed among the six possible column widths in SAS7BDAT files.
 
 Numeric Binary Formats
 ----------------------
