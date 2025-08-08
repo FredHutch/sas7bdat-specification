@@ -15,10 +15,11 @@ by:
     | Clint Cummins, PhD
     | clint@stanford.edu
 
-
 Copyright (C) 2013 is retained by the authors listed above.
 This work is licensed under the Creative Commons Attribution-ShareAlike 3.0 Unported License.
 To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/3.0/.
+
+Further contributions in 2025 by David Costanzo from Fred Hutch Cancer Center.
 
 Contents
 ========
@@ -30,7 +31,6 @@ Contents
 - `SAS7BDAT Packed Binary Data`_
 - `Platform Differences`_
 - `Compression Data`_
-- `Software Prototype`_
 - `ToDo`_
 
 Introduction
