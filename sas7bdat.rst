@@ -880,7 +880,7 @@ offset  length  conf.   description
 Column List Subheader
 ---------------------
 
-The purpose of this subheader is not clear. But the structure is partly identified.
+The purpose of this subheader is not clear, but the structure is partly identified.
 Information related to this subheader was contributed by Clint Cummins.
 ``eyecarex.sas7bdat`` (created by Stat/Transfer) does not have this subheader.
 
