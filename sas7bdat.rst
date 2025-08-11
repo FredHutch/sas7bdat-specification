@@ -179,21 +179,21 @@ In particular:
 The following table describes some of the possible polymorphisms for the 8 bytes at offset 32.
 The first field lists the name of the file where the sequence was found (see the ``test-files`` directory), the second lists the eight byte values (hexadecimal), the third field shows bytes 216-239 in ASCII ('.' represents a non-ASCII character or '\0'), and the fourth field lists the SAS7BDAT sub-format.
 
-=========================== =================================== ============================ ======================
-filename                    bytes 32-39                         bytes 216-239                sub-format
-=========================== =================================== ============================ ======================
-``compress_no.sas7bdat``    ``x22 x22 x00 x32 x22 x01 x02 x32`` ``9.0101M3NET_ASRV........`` Windows Intel
-``compress_yes.sas7bdat``   ``x22 x22 x00 x32 x22 x01 x02 x32`` ``9.0101M3NET_ASRV........`` Windows Intel
-``lowbwt_i386.sas7bdat``    ``x22 x22 x00 x32 x22 x01 x02 x32`` ``9.0202M0W32_VSPRO.......`` Windows Intel
-``missing_values.sas7bdat`` ``x22 x22 x00 x32 x22 x01 x02 x32`` ``9.0202M0W32_VSPRO.......`` Windows Intel
-``obs_all_perf_1.sas7bdat`` ``x22 x22 x00 x32 x22 x01 x02 x32`` ``9.0101M3XP_PRO..........`` Windows Intel
-``adsl.sas7bdat``           ``x22 x22 x00 x33 x33 x01 x02 x32`` ``....9.0202M3X64_ESRV....`` Windows x64 Intel
-``eyecarex.sas7bdat``       ``x22 x22 x00 x33 x22 x00 x02 x31`` ``....9.0000M0WIN.........`` Unix non-Intel
-``lowbwt_x64.sas7bdat``     ``x22 x22 x00 x33 x33 x01 x02 x32`` ``....9.0202M2X64_VSPRO...`` Windows x64 Intel
-``natlterr1994.sas7bdat``   ``x33 x22 x00 x33 x33 x00 x02 x31`` ``........9.0101M3SunOS...`` u64 Unix non-Intel
-``natlterr2006.sas7bdat``   ``x33 x22 x00 x33 x33 x00 x02 x31`` ``........9.0101M3SunOS...`` u64 Unix non-Intel
-``txzips.sas7bdat``         ``x33 x22 x00 x33 x33 x01 x02 x31`` ``........9.0201M0Linux...`` u64 Unix Intel
-=========================== =================================== ============================ ======================
+==================================  =================================== ============================ ======================
+filename                            bytes 32-39                         bytes 216-239                sub-format
+==================================  =================================== ============================ ======================
+``compress_no.sas7bdat``            ``x22 x22 x00 x32 x22 x01 x02 x32`` ``9.0101M3NET_ASRV........`` Windows Intel
+``compress_yes.sas7bdat``           ``x22 x22 x00 x32 x22 x01 x02 x32`` ``9.0101M3NET_ASRV........`` Windows Intel
+``lowbwt_i386.sas7bdat``            ``x22 x22 x00 x32 x22 x01 x02 x32`` ``9.0202M0W32_VSPRO.......`` Windows Intel
+``missing_values.sas7bdat``         ``x22 x22 x00 x32 x22 x01 x02 x32`` ``9.0202M0W32_VSPRO.......`` Windows Intel
+``obs_all_perf_1.sas7bdat``         ``x22 x22 x00 x32 x22 x01 x02 x32`` ``9.0101M3XP_PRO..........`` Windows Intel
+``adsl.sas7bdat``                   ``x22 x22 x00 x33 x33 x01 x02 x32`` ``....9.0202M3X64_ESRV....`` Windows x64 Intel
+``cbsatocountycrosswalk.sas7bdat``  ``x22 x22 x00 x32 x22 x01 x02 x31`` ``9.0000M0WIN.............`` Windows Intel
+``lowbwt_x64.sas7bdat``             ``x22 x22 x00 x33 x33 x01 x02 x32`` ``....9.0202M2X64_VSPRO...`` Windows x64 Intel
+``natlterr1994.sas7bdat``           ``x33 x22 x00 x33 x33 x00 x02 x31`` ``........9.0101M3SunOS...`` u64 Unix non-Intel
+``natlterr2006.sas7bdat``           ``x33 x22 x00 x33 x33 x00 x02 x31`` ``........9.0101M3SunOS...`` u64 Unix non-Intel
+``txzips.sas7bdat``                 ``x33 x22 x00 x33 x33 x01 x02 x31`` ``........9.0201M0Linux...`` u64 Unix Intel
+==================================  =================================== ============================ ======================
 
 .. _`table of hexadecimal, decimal, and binary values`:
 
@@ -574,7 +574,7 @@ The row size subheader holds information about row length (in bytes), their tota
 Fields at offset 28|56 and higher are not needed to read the file, but are documented here for completeness.
 Some of these appear to be buffer sizes that could be preallocated to hold the rest of the dataset.
 Others appear to the location of metadata-information.
-The four test files used for example data in the higher fields are ``eyecarex.sas7bdat``, ``acadindx.sas7bdat``, ``natlterr1994.sas7bdat``, ``txzips.sas7bdat`` (non-Intel/Intel x regular/u64).
+The four test files used for example data in the higher fields are ``cbsatocountycrosswalk.sas7bdat``, ``acadindx.sas7bdat``, ``natlterr1994.sas7bdat``, ``txzips.sas7bdat`` (non-Intel/Intel x regular/u64).
 
 .. class:: offset-table
 
@@ -880,9 +880,10 @@ offset  length  conf.   description
 Column List Subheader
 ---------------------
 
-The purpose of this subheader is not clear, but the structure is partly identified.
+The purpose of this subheader type is not clear, but the structure is partly identified.
 Information related to this subheader was contributed by Clint Cummins.
-``eyecarex.sas7bdat`` (created by Stat/Transfer) does not have this subheader.
+
+Files created by Stat/Transfer do not have this subheader.
 
 This subheader is not present in datasets which have only one column.
 
@@ -1167,7 +1168,6 @@ The extensions to SAS7BDAT files for **u64** and non-Intel formats was contribut
 
 In particular, the files ``natlerr1944.sas7bdat``, ``natlerr2006.sas7bdat`` appear to be generated on the 'SunOS' platform (**u64**, non-Intel).
 ``txzips.sas7bdat`` was created on Linux 64-bit SAS server (**u64**, Intel).
-``eyecarex.sas7bdat`` is non-Intel, possibly 32-bit PowerPC.
 
 The files ``cfrance2.sas7bdat``, ``cfrance.sas7bdat``, ``coutline.sas7bdat``,  ``gfrance2.sas7bdat``, ``gfrance.sas7bdat``, ``goutline.sas7bdat``, ``xfrance2.sas7bdat``, ``xfrance.sas7bdat``, ``xoutline.sas7bdat`` appear to be generated on a 32-bit 'Linux' Intel system.
 They have the same format as Windows files, except for the (ignorable) OS strings in the first header.
@@ -1177,25 +1177,25 @@ In particular, Kasper Sorenson discovered some text that appears to be encoded u
 
 **Key Test Files**
 
-=================================   ======================================
-filename                            format features
-=================================   ======================================
-``acadindx.sas7bdat``               non-u64, Intel (most files are like this one)
-``br.sas7bdat``                     truncated doubles (widths 3,4,6; compare with br2 widths all 8)
-``eyecarex.sas7bdat``               non-u64, non-Intel, written by Stat/Transfer
-``txzips.sas7bdat``                 u64, Intel
-``natlterr1994.sas7bdat``           u64, non-Intel
-``hltheds2006.sas7bdat``            2 Column Attributes subheaders
-``moshim.sas7bdat``                 3 Column Attributes subheaders
-``flightdelays.sas7bdat``           2 Column Text subheaders
-``ymcls_p2_long_040506.sas7bdat``   5 Column Text subheaders, first Column Attributes subheader is on page 6
-``flightschedule.sas7bdat``         2+ Column Text subheaders
-``internationalflight.sas7bdat``    2+ Column Text subheaders
-``marchflights.sas7bdat``           2+ Column Text subheaders
-``mechanicslevel1.sas7bdat``        2+ Column Text subheaders
-``compress_yes.sas7bdat``           COMPRESS=CHAR, one PGTYPE=-28672, no RLE compression (COMP=0)
-``obs_all_perf_1.sas7bdat``         COMPRESS=CHAR, many PGTYPE=16384, much RLE compression (COMP=4)
-=================================   ======================================
+=====================================   ======================================
+filename                                format features
+=====================================   ======================================
+``acadindx.sas7bdat``                   non-u64, Intel (most files are like this one)
+``br.sas7bdat``                         truncated doubles (widths 3,4,6; compare with br2 widths all 8)
+``cbsatocountycrosswalk.sas7bdat``      Written by Stat/Transfer
+``txzips.sas7bdat``                     u64, Intel
+``natlterr1994.sas7bdat``               u64, non-Intel
+``hltheds2006.sas7bdat``                2 Column Attributes subheaders
+``moshim.sas7bdat``                     3 Column Attributes subheaders
+``flightdelays.sas7bdat``               2 Column Text subheaders
+``ymcls_p2_long_040506.sas7bdat``       5 Column Text subheaders, first Column Attributes subheader is on page 6
+``flightschedule.sas7bdat``             2+ Column Text subheaders
+``internationalflight.sas7bdat``        2+ Column Text subheaders
+``marchflights.sas7bdat``               2+ Column Text subheaders
+``mechanicslevel1.sas7bdat``            2+ Column Text subheaders
+``compress_yes.sas7bdat``               COMPRESS=CHAR, one PGTYPE=-28672, no RLE compression (COMP=0)
+``obs_all_perf_1.sas7bdat``             COMPRESS=CHAR, many PGTYPE=16384, much RLE compression (COMP=4)
+=====================================   ======================================
 
 
 Compression Data
