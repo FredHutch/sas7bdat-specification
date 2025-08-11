@@ -98,7 +98,7 @@ Header Offset Table
 .. class:: offset-table
 
 ==============  ======  ======  ===============================================
-offset          length  conf.   description
+Offset          Length  Conf.   Description
 ==============  ======  ======  ===============================================
 0               32      high    binary, `magic number`_
 32              1       high    binary, Alignment_: if (byte==x33) a2=4 else a2=0.  **u64** is true if a2=4 (unix 64-bit format).
@@ -178,7 +178,7 @@ The following table describes some of the possible polymorphisms for the 8 bytes
 The first field lists the name of the file where the sequence was found (see the ``test-files`` directory), the second lists the eight byte values (hexadecimal), the third field shows bytes 216-239 in ASCII ('.' represents a non-ASCII character or '\0'), and the fourth field lists the SAS7BDAT sub-format.
 
 ==================================  =================================== ============================ ======================
-filename                            bytes 32-39                         bytes 216-239                sub-format
+Filename                            Bytes 32-39                         Bytes 216-239                Sub-format
 ==================================  =================================== ============================ ======================
 ``compress_no.sas7bdat``            ``x22 x22 x00 x32 x22 x01 x02 x32`` ``9.0101M3NET_ASRV........`` Windows Intel
 ``compress_yes.sas7bdat``           ``x22 x22 x00 x32 x22 x01 x02 x32`` ``9.0101M3NET_ASRV........`` Windows Intel
@@ -198,7 +198,7 @@ filename                            bytes 32-39                         bytes 21
 The binary representation for the hexadecimal values present in the table above are given below.
 
 ===========  =======  =============
-hexadecimal  decimal  binary
+Hexadecimal  Decimal  Binary
 ===========  =======  =============
 ``x01``      ``001``  ``b00000001``
 ``x02``      ``002``  ``b00000010``
@@ -250,7 +250,7 @@ The different values may indicate different encodings of different sections of t
 The table below lists the values that are known to occur and the associated character encoding.
 
 ==============  ==============  =============
-Encoding byte   SAS name        iconv name
+Encoding Byte   SAS Name        iconv Name
 ==============  ==============  =============
 0               (Unspecified)   (Unspecified)
 20              utf-8           UTF-8
@@ -417,7 +417,7 @@ Page Offset Table
 .. class:: offset-table
 
 ==============  ==============  ======  ===============================================
-offset          length          conf.   description
+Offset          Length          Conf.   Description
 ==============  ==============  ======  ===============================================
 0               4               high    int, next `Page Sequence Number`_
 4               8|20            low     *????????????*
@@ -483,7 +483,7 @@ The subheader pointers encode information about the offset and length of subhead
 .. class:: offset-table
 
 ======= ======  ======  ===============================================
-offset  length  conf.   description
+Offset  Length  Conf.   Description
 ======= ======  ======  ===============================================
 0       4|8     high    int, offset from page start to subheader
 4|8     4|8     high    int, length of subheader := _`QL`
@@ -501,7 +501,7 @@ This may be used to indicate the end of the subheader pointers array.
 .. class:: comp-table
 
 ======= ============
-`COMP`_ description
+`COMP`_ Description
 ======= ============
 0       Uncompressed
 1       Truncated (ignore data)
@@ -516,7 +516,7 @@ Furthermore, the data is stored as a subheaders.
 .. class:: st-table
 
 ====    ============
-ST      subheaders
+ST      Subheaders
 ====    ============
 0       Row Size, Column Size, Subheader Counts, Column Format and Label, in Uncompressed file
 1       Column Text, Column Names, Column Attributes, Column List
@@ -587,7 +587,7 @@ The four test files used for example data in the higher fields are ``cbsatocount
 .. class:: offset-table
 
 =========   =========   ======  ===============================================
-offset      length      conf.   description
+Offset      Length      Conf.   Description
 =========   =========   ======  ===============================================
 0           4|8         high    binary, signature xF7F7F7F7|xF7F7F7F700000000
 4|8         4|8         low     *????????????*; x00 has been observed on **u64**
@@ -650,7 +650,7 @@ The column size subheader holds the number of columns (variables).
 .. class:: offset-table
 
 ======= ======  ======  =================================
-offset  length  conf.   description
+Offset  Length  Conf.   Description
 ======= ======  ======  =================================
 0       4|8     high    binary, signature xF6F6F6F6|xF6F6F6F600000000
 4|8     4|8     high    int, number of columns := NCOL
@@ -673,7 +673,7 @@ The structure of this subheader was deduced and reported by Clint Cummins.
 .. class:: offset-table
 
 =========   ======= ======  ===============================================
-offset      length  conf.   description
+Offset      Length  Conf.   Description
 =========   ======= ======  ===============================================
 0           4|8     high    int, signature -1024 (x00FCFFFF|x00FCFFFFFFFFFFFF)
 4|8         4|8     medium  int, the max `subheader payload size`_ of all variable-size subheaders, as reported at their offset 4|8
@@ -692,7 +692,7 @@ The subheader count vectors encode information for 4 known subheader types, 3 un
 .. class:: offset-table
 
 ======= ======  ======  =====================================================
-offset  length  conf.   description
+Offset  Length  Conf.   Description
 ======= ======  ======  =====================================================
 0       4|8     high    int, subheader signature (see list below)
 4|8     8|16    medium  two 4|8 byte integer values, the `subheader location`_ of where this subheader first appears := <PAGE1, LOC1>
@@ -741,7 +741,7 @@ They provide the semantics of how each string is significant to the dataset.
 .. class:: offset-table
 
 ======= ======  ======  ===============================================
-offset  length  conf.   description
+Offset  Length  Conf.   Description
 ======= ======  ======  ===============================================
 0       4|8     high    int, signature -3 (xFDFFFFFF|xFDFFFFFFFFFFFFFF)
 4|8     2       medium  int, `subheader payload size`_ (QL - 12|20)
@@ -772,7 +772,7 @@ There may be multiple column name subheaders, indexing into multiple column text
 .. class:: offset-table
 
 ======= ======  ======  ====================================================
-offset  length  conf.   description
+Offset  Length  Conf.   Description
 ======= ======  ======  ====================================================
 0       4|8     high    int, signature -1 (xFFFFFFFF|xFFFFFFFFFFFFFFFF)
 4|8     2       medium  int, `subheader payload size`_ (QL - 12|20)
@@ -794,7 +794,7 @@ Each column name pointer is a `text reference`_ with two bytes of padding.
 .. class:: offset-table
 
 ======  ======  ======  ======================================================
-offset  length  conf.   description
+Offset  Length  Conf.   Description
 ======  ======  ======  ======================================================
 0       2       high    int, column name index to select `Column Text Subheader`_
 2       2       high    int, column name offset w.r.t. end of selected Column Text signature.  Always a multiple of 4.
@@ -819,7 +819,7 @@ By putting all of the numeric variables first, this alignment constraint can be 
 .. class:: offset-table
 
 ======= =========   ======  ===================================================
-offset  length      conf.   description
+Offset  Length      Conf.   Description
 ======= =========   ======  ===================================================
 0       4|8         high    int, signature -4 (xFCFFFFFF|xFCFFFFFFFFFFFFFF)
 4|8     2           medium  int, `subheader payload size`_ (QL - 12|20)
@@ -836,7 +836,7 @@ Column Attribute Vectors
 .. class:: offset-table
 
 ==============  ======  ======  ===============================================
-offset          length  conf.   description
+Offset          Length  Conf.   Description
 ==============  ======  ======  ===============================================
 0               4|8     high    int, column offset in data row (in bytes)
 4|8             4       high    int, column width
@@ -849,7 +849,7 @@ offset          length  conf.   description
 Observed values of name flag in the source files:
 
 =========   =================================================================
-name flag   description
+Name Flag   Description
 =========   =================================================================
 4           name length <= 8
 1024        usually means name length <= 8 but sometimes the length is 9-12
@@ -869,7 +869,7 @@ The structure of column format pointers was contributed by Clint Cummins.
 .. class:: offset-table
 
 ======= ======= ======  ===============================================
-offset  length  conf.   description
+Offset  Length  Conf.   Description
 ======= ======= ======  ===============================================
 0       4|8     high    int, signature -1026 (xFEFBFFFF|xFEFBFFFFFFFFFF)
 4|8     12|16   low     *????????????*; zeros
@@ -898,7 +898,7 @@ This subheader is not present in datasets which have only one column.
 .. class:: offset-table
 
 ======= ======  ======  ===============================================
-offset  length  conf.   description
+Offset  Length  Conf.   Description
 ======= ======  ======  ===============================================
 0       4|8     high    int, signature -2 (xFEFFFFFF|xFEFFFFFFFFFFFFFF)
 4|8     2       medium  `subheader payload size`_ (CL * 2 + MCL - 4|8)
@@ -1186,7 +1186,7 @@ In particular, Kasper Sorenson discovered some text that appears to be encoded u
 **Key Test Files**
 
 =====================================   ======================================
-filename                                format features
+Filename                                Format Features
 =====================================   ======================================
 ``acadindx.sas7bdat``                   non-u64, Intel (most files are like this one)
 ``br.sas7bdat``                         truncated doubles (widths 3,4,6; compare with br2 widths all 8)
@@ -1210,16 +1210,15 @@ Compression Data
 ================
 
 The table below presents the results of compression tests on a collection of 142 SAS7BDAT dataset found on the Internet.
-The 'type' field represents the type of compression, 'ctime' is the compression time (in seconds), 'dtime' is the decompression time, and the 'compression ratio' field holds the cumulative disk usage (in megabytes) before and after compression.
 Although the ``xz`` algorithm requires significantly more time to compress these data, the decompression time is on par with gzip.
 
-=============   ======  ======  =========================
-type            ctime   dtime   compression ratio
-=============   ======  ======  =========================
-gzip -9         76.7s   2.6s    541M / 30.3M = 17.9
-bzip2 -9        92.7s   11.2s   541M / 19.0M = 28.5
-xz -9           434.2s  2.7s    541M / 12.8M = 42.3
-=============   ======  ======  =========================
+=============   ================    ==================  =========================
+Type            Compression Time    Decompression Time  Compression Ratio
+=============   ================    ==================  =========================
+gzip -9         76.7 seconds        2.6 seconds         541M / 30.3M = 17.9
+bzip2 -9        92.7 seconds        11.2 seconds        541M / 19.0M = 28.5
+xz -9           434.2 seconds       2.7 seconds         541M / 12.8M = 42.3
+=============   ================    ==================  =========================
 
 ToDo
 ====

@@ -27,6 +27,8 @@ well, arbitrary choices in style must all be made the same way.
    | meta-information | Not "metadata" or "meta-data"             |
    | variable-size    | Not "variable-length" or "variable-sized" |
 
+4. Table column headers are capitalized.
+
 Data Files
 -----------
 The specification was reverse-engineered by examining free SAS7BDAT files found on the Web.
