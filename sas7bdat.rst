@@ -522,10 +522,24 @@ SAS7BDAT Subheaders
 Subheaders contain meta-information regarding the SAS7BDAT dataset, including row and column counts, column names, labels, and types.
 Each subheader is associated with a four- or eight-byte 'signature' (**u64**) that identifies the subheader type, and hence, how it should be parsed.
 
-Some subheaders types may appear more than once.  The `Column Format subheader` is repeated once per variable.
-The subheaders with variable sizes may appear more than once if its content would not fit in the space remaining on the page or within the maximum subheader size of 32767 bytes.
-In all cases, when a subheader type appears more than once, all subheaders of the same type are consecutive within the SAS7BDAT file.
-Furthermore, the subheader types are ordered as follows within the `Subheader Pointers`_ table.
+Some subheaders types may appear more than once.
+For example, the `Column Format subheader` is repeated once per variable.
+When a subheader type appears more than once, all subheaders of that type are adjacent.
+
+The Column Text, Column Name, Column Attributes, and Column List subheader types have a variable size.
+
+All variable-size subheaders have a 2 byte "_`subheader payload size`" field at offset 4|8, just after the subheader signature.
+The subheader payload size is the number of bytes in the subheader without including the 4|8 byte signature or 8|12 bytes of padding at the end.
+Therefore, it is always 12|20 bytes smaller than QL, the subheader size given in the `Subheader Pointers`_ table.
+
+Every variable-size subheader type may appear one or more times.
+They appear more than once if their total content would not fit in the space remaining on the page or within the maximum subheader size of 32767 bytes.
+
+The variable-size subheader types provide information about specific columns.
+When a subheader type appears more than once, each one provides information for an exclusive subset of columns.
+The order in which data is read from multiple subheaders corresponds to the reading order (left to right) of columns.
+
+The subheader types are ordered as follows within the `Subheader Pointers`_ table.
 
 1. `Row Size subheader`_
 2. `Column Size subheader`_
@@ -642,18 +656,9 @@ Subheader Counts Subheader
 
 The Subheader Counts subheader contains information about the variable-size subheaders within the dataset.
 
-All variable-size subheaders have a "payload size" field at offset 4|8, just after the subheader signature.
-The payload size is the number of bytes in the subheader without including the signature or padding at the end.
+All variable-size subheaders have a `subheader payload size`_ field at offset 4|8, just after the subheader signature.
 The field at offset 4|8 in the Subheader Counts subheader is the maximum value of all payload sizes.
 This might be useful to a reader that wants to preallocate space to hold the data.
-
-Every variable-sized subheader type may appear one or more times.
-When they appear more than once, all subheaders of that type are adjacent.
-The vectored part of the Subheader Counts subheader describes the location of the first and last appearance of each variable-sized subheader type.
-
-The variable-size subheader types provide information about specific columns.
-When a subheader type appears more than once, each one provides information for an exclusive subset of columns.
-The order in which data is read from multiple subheaders corresponds to the reading order (left to right) of columns.
 
 The structure of this subheader was deduced and reported by Clint Cummins.
 
@@ -663,7 +668,7 @@ The structure of this subheader was deduced and reported by Clint Cummins.
 offset      length  conf.   description
 =========   ======= ======  ===============================================
 0           4|8     high    int, signature -1024 (x00FCFFFF|x00FCFFFFFFFFFFFF)
-4|8         4|8     medium  int, the max payload size of all variable-size subheaders, as reported at their offset 4|8
+4|8         4|8     medium  int, the max `subheader payload size`_ of all variable-size subheaders, as reported at their offset 4|8
 8|16        4|8     medium  int, the number of subheader count vectors with a non-zero appearance (usually 4)
 12|24       4|8     medium  int, the number of subheader count vectors with a non-zero signature
 16|32       50|88   low     *????????????*
@@ -731,7 +736,7 @@ They provide the semantics of how each string is significant to the dataset.
 offset  length  conf.   description
 ======= ======  ======  ===============================================
 0       4|8     high    int, signature -3 (xFDFFFFFF|xFDFFFFFFFFFFFFFF)
-4|8     2       medium  int, size of text block (QL - 16|20)
+4|8     2       medium  int, `subheader payload size`_ (QL - 12|20)
 6|10    2       low     *????????????*
 8|12    2       low     *????????????*
 10|14   2       low     *????????????*
@@ -762,7 +767,7 @@ There may be multiple column name subheaders, indexing into multiple column text
 offset  length  conf.   description
 ======= ======  ======  ====================================================
 0       4|8     high    int, signature -1 (xFFFFFFFF|xFFFFFFFFFFFFFFFF)
-4|8     2       medium  int, length of remaining subheader (QL - 16|20)
+4|8     2       medium  int, `subheader payload size`_ (QL - 12|20)
 6|10    2       low     *????????????*
 8|12    2       low     *????????????*
 10|14   2       low     *????????????*
@@ -809,7 +814,7 @@ By putting all of the numeric variables first, this alignment constraint can be 
 offset  length      conf.   description
 ======= =========   ======  ===================================================
 0       4|8         high    int, signature -4 (xFCFFFFFF|xFCFFFFFFFFFFFFFF)
-4|8     2           medium  int, length of remaining subheader
+4|8     2           medium  int, `subheader payload size`_ (QL - 12|20)
 6|10    2           low     *????????????*
 8|12    2           low     *????????????*
 10|14   2           low     *????????????*
@@ -887,7 +892,7 @@ This subheader is not present in datasets which have only one column.
 offset  length  conf.   description
 ======= ======  ======  ===============================================
 0       4|8     high    int, signature -2 (xFEFFFFFF|xFEFFFFFFFFFFFFFF)
-4|8     2       medium  size of data in subheader; CL * 2 + MCL - 4|8
+4|8     2       medium  `subheader payload size`_ (CL * 2 + MCL - 4|8)
 6|10    6       low     *????????????*
 12|16   4|8     medium  int, length of remaining subheader
 16|24   2       low     int, usually equals NCOL
