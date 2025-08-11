@@ -746,6 +746,10 @@ The "subheader index" component of a `text reference`_ selects a particular text
 
 The offset of a text reference is always a multiple of 4, so the strings within this subheader often end with a few bytes of value x00 for padding.
 
+The first four bytes of the text array at 16|20 in the first Column Text subheader of a dataset is usually x00 x00 x00 x00, but in some datasets, one of the bytes is not x00.
+This *may* be referenced by the field in the `Row Size subheader` at offset 344|672.
+The purpose of these four bytes is unknown.
+
 Column Name Subheader
 ---------------------
 
@@ -1216,3 +1220,4 @@ ToDo
 - identify purpose of various unknown header quantities
 - determine purpose of Column List subheader
 - determine pattern of the 'page sequence number' fields.
+- determine the purpose of the first four bytes in the text array of the first `Column Text subheader`_.
