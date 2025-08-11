@@ -52,8 +52,6 @@ The name 'SAS7BDAT' is not official, but is used throughout this document to ref
 
 There are significant differences in the SAS7BDAT format depending on the operating systems and computer hardware platforms (32-bit vs. 64-bit).
 See the section on `platform differences`_ for more details.
-The format described below is sufficient to read the entire collection of test files referenced in ``test-files/data-file-urls.txt`` (i.e. files associated with 32-bit and some 64-bit builds of SAS for Microsoft Windows, and **u64** SAS versions).
-This includes files created with COMPRESS=CHAR.
 
 The figure below illustrates the overall structure of a SAS7BDAT file.
 Each file consists of a header (length := HL bytes), followed by PC pages, each of length PL bytes (PC and PL are shorthand for 'page count' and 'page size' respectively, and are used to denote these quantities throughout this document)::
