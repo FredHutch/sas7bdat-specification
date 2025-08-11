@@ -27,6 +27,11 @@ styles:
     parent: table
     colWidths: [ 2.5cm, 1.75cm, 3cm, null, null ]
 
+  # Without a style, the "M" column wraps for long values
+  numeric-binary-format-table:
+    parent: table
+    colWidths: [ 3cm, 2cm, 2cm, 2.5cm, 2cm, null ]
+
   # Without a style, the long "Interpretations" in the Inter table causes
   # the "Format" column to wrap.
   date-time-format-table:
