@@ -386,9 +386,9 @@ The first three are those that contain meta-information (e.g. field/column attri
 These types are denoted 'meta', 'data', and 'mix' respectively.
 Meta-information is required to correctly interpret the packed binary information.
 Hence, this information must be parsed first.
-A 'meta' page contains only meta-information.
-A 'mix' page contains both meta-information and data.
-A 'data' page contains only data.
+A 'meta' page contains only meta-information and compressed data
+A 'mix' page contains both meta-information and uncompressed data.
+A 'data' page contains only uncompressed data.
 In test files, the pages are ordered as zero or more 'meta' pages, followed by a 'mix' page, followed by zero or more 'data' pages.
 In some test data files, there is a fourth page type, denoted 'amd'.
 This page usually occurs last, and appears to contain amended meta-information.
@@ -398,15 +398,15 @@ Conceptually, all pages have the same structure and some parts are optional::
   ---------------------------------
   |            header             |  required 24|40 byte header
   |-------------------------------|
-  |      subheader pointers       |  meta-information
+  |      subheader pointers       |  meta-information and compressed data
   |-------------------------------|
-  |  SAS7BDAT packed binary data  |  data
+  |  SAS7BDAT packed binary data  |  uncompressed data
   |-------------------------------|
   |         unused space          |
   |-------------------------------|
-  |  deleted flags for data rows  |  data
+  |  deleted flags for data rows  |  uncompressed data
   |-------------------------------|
-  | subheaders (meta-information) |  meta-information
+  | subheaders (meta-information) |  meta-information and compressed data
   ---------------------------------
 
 The `page offset table`_ below describes each page type.
@@ -423,7 +423,7 @@ offset          length          conf.   description
 4               8|20            low     *????????????*
 12|24           4|8             low     number of unused bytes on page
 16|32           2               medium  int, bit field `page type`_ := PGTYPE
-18|34           2               medium  int, data block count := _`BC`
+18|34           2               medium  int, uncompressed data block count := _`BC`
 20|36           2               medium  int, `subheader pointers`_ count := _`SC` <= `BC`_
 22|38           2               low     *????????????*
 24|40           SC*SL           high    SC `subheader pointers`_, SL = 12|24
@@ -450,23 +450,28 @@ PGTYPE  name    subheaders  uncompressed row data   compressed row data
 ======  ====    ==========  ======================  ===================================
 
 There are at least four page types 'meta', 'data', 'mix', and 'amd'.
-These types are encoded in the most significant byte of a two byte bit field at page offset 16|32.
+These types are encoded in the most significant byte of a two-byte field at page offset 16|32.
 If no bit is set, the following page is of type 'meta'.
 If the first, second, or third bits are set, then the page is of type 'data', 'mix', or 'amd', respectively.
-Hence, if the two bytes are interpreted as an unsigned integer, then the 'meta', 'data', 'mix', and 'amd' types correspond to 0, 256, 512, and 1024, respectively. In compressed files, other bits (and sometimes multiple bits) have been set (e.g., ``1 << 16 | 1 << 13``, which is ``-28672`` signed, or ``36864`` unsigned).
+Hence, if the two bytes are interpreted as an unsigned integer, then the 'meta', 'data', 'mix', and 'amd' types correspond to 0, 256, 512, and 1024, respectively.
+In compressed files, other bits (and sometimes multiple bits) have been set (e.g., ``1 << 16 | 1 << 13``, which is ``-28672`` signed, or ``36864`` unsigned).
 However, the pattern is unclear.
 
 If a page has meta-information, then it is of type 'meta', 'mix', or 'amd' and beginning at offset byte 24|40 are a sequence of SC SL-byte `subheader pointers`_, which point to an offset farther down the page, starting at the end of the page and moving backward.
 `SAS7BDAT Subheaders`_ stored at these offsets hold meta-information about the dataset, including the column names, labels, and types.
 
-If a page has data, then it is of type 'mix' or 'data'.
+If a page has uncompressed data, then it is of type 'mix' or 'data'.
 In page of type 'mix', packed binary data **begins at the next 8 byte boundary following the last subheader pointer**.
 Formally, the data begin at offset 24|40+SC*SL+DL, where DL = (24|40+SC*SL+7) % 8 * 8 and '%' is the modulo operator.
 If a page is of type 'data', then packed binary data begins at offset 24|40, because SC=0.
 
-The 'comp' page was observed as page 2 of the `compress_yes.sas7bdat` test file (not distributed with the ``sas7bdat`` package).
-It has BC and SC fields, but no subheader pointers.
-It contains some initial data and 2 tables. The first table has many rows of length 24; its purpose is unknown.
+If a page has compressed data, then it is of type 'meta'.
+The data rows have variable length and each of them are referenced by the subheader pointers table.
+
+The 'comp' page was observed as page 2 of the `dates_char.sas7bdat` test file.
+It has BC and SC fields but no subheader pointers.
+It contains some initial data and 2 tables.
+The first table has many rows of length 24; its purpose is unknown.
 The second table has one entry per data page with the page number and the number of data rows on the page for SC pages.
 It could be used to access a particular row without reading all preceding data pages.
 
@@ -493,16 +498,20 @@ In this case QL is usually 0.
 From observation, the final subheader pointer on a page always has COMP=1.
 This may be used to indicate the end of the subheader pointers array.
 
+.. class:: comp-table
+
 ======= ============
 `COMP`_ description
 ======= ============
-0       uncompressed
-1       truncated (ignore data)
-4       RLE compressed row data with control byte
+0       Uncompressed
+1       Truncated (ignore data)
+4       A row of data in a compressed dataset (see `compressed binary data subheader`)
 ======= ============
 
-The subheaders with ST=0 have fixed size and the subheaders with ST=1 have a variable size.
-All subheaders with ST=1 have an integer at offset 4|8 that is 4|8 bytes long whose value is the size of the subheader minus the size of the signature and the padding at the end of the subheader.
+In an uncompressed file, the subheaders with ST=0 have fixed size and the subheaders with ST=1 have a variable size.
+
+In a compressed file, all subheaders have ST=1.
+Furthermore, the data is stored as a subheaders.
 
 .. class:: st-table
 
@@ -924,7 +933,7 @@ Compressed Binary Data Subheader
 --------------------------------
 
 When a SAS7BDAT file is created by SAS with the option COMPRESS=CHAR or COMPRESS=YES, each row of data is compressed independently with a Run Length Encoding (RLE) structure.
-This yields a variable length compressed row.
+This yields a variable-length compressed row.
 Each such row is stored in a single subheader in sequential order, indexed by the `subheader pointers`_.
 A RLE compressed data row is identified by COMP=4 in the subheader pointer and does not have a subheader signature.
 If a particular row has highly variable data and yields no compression, it is still stored in a subheader but uncompressed with COMP=0 instead of COMP=4.

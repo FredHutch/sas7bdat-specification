@@ -15,6 +15,12 @@ styles:
     parent: table
     colWidths: [ 2cm, 1.5cm, 3cm, null, null ]
 
+  # Without a style, the long descriptions in the "COMP table" causes the "COMP" header to have
+  # a line break between the "CO" and the "MP".
+  comp-table:
+    parent: table
+    colWidths: [ 2cm, null ]
+
   # Without a style, the long descriptions in the "ST table" causes the "ST" header to have
   # a line break between the "S" and the "T".
   st-table:
