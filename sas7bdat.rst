@@ -219,7 +219,8 @@ Because `SAS7BDAT Packed Binary Data`_ may contain double precision values, it a
 Alignment of data structures according to the platform word length (4 bytes for 32-bit, and 8 bytes for 64-bit architectures) facilitates efficient operations on data stored in memory.
 It also suggests that parts of SAS7BDAT data file format are platform dependent.
 One theory is that the SAS implementation utilizes a common C or C++ structure or class to reference data stored in memory.
-When compiled, these structures are aligned according to the word length of the target platform. Of course, when SAS was originally written, platform differences may not have been foreseeable.
+When compiled, these structures are aligned according to the word length of the target platform.
+Of course, when SAS was originally written, platform differences may not have been foreseeable.
 Hence, these inconsistencies may not have been intentional.
 
 Magic Number
