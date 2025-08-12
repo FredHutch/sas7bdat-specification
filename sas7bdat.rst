@@ -1057,14 +1057,17 @@ When multiple rows occur on a single page, they are immediately adjacent.
 When a dataset contains many rows, it is typical that the collection of rows (i.e. their data) is evenly distributed to a number of 'data' pages.
 However, in test files, no single row's data is broken across two or more pages.
 A single data row is parsed by interpreting the binary data according to the collection of column attributes contained in the `column attributes subheader`_.
-Binary data can be interpreted in two ways, as ASCII characters, or as floating point numbers.
+Binary data can be interpreted in two ways: as characters or as floating point numbers.
 The column width attribute specifies the number of bytes associated with a column.
-For character data, this interpretation is straight-forward.
-For numeric data, interpretation of the column width is more complex.
 
+Character data is encoded into bytes using the character encoding scheme specified in the `Header Offset Table`_.
+Because values always occupy the exact number of bytes specified in the column attributes subheader, it's common for character values to be padded with blank spaces (ASCII code point 32).
+By convention, SAS ignores trailing spaces.
+
+Numeric data is encoded in the CPU's native floating point representation.
 The common binary representation of floating point numbers has three parts; the sign (``s``), exponent (``e``), and mantissa (``m``).
 The corresponding floating point number is ``s * m * b ^ e``, where ``b`` is the base (2 for binary, 10 for decimal).
-Under the IEEE 754 floating point standard, the sign, exponent, and mantissa are encoded by 1, 11, and 52 bits respectively, totaling 8 bytes.
+Modern CPUs follow the IEEE 754 floating point standard, so the sign, exponent, and mantissa are encoded by 1, 11, and 52 bits respectively, totaling 8 bytes.
 In SAS7BDAT file, numeric quantities can be 3, 4, 5, 6, 7, or 8 bytes in length.
 For numeric quantities of less than 8 bytes, the remaining number of bytes are truncated from the least significant part of the mantissa.
 Hence, the minimum and maximum numeric values are identical for all byte lengths, but shorter numeric values have reduced precision.
