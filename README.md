@@ -21,11 +21,12 @@ well, arbitrary choices in style must all be made the same way.
 
 3. When a term has many synonyms or alternate spellings, a single, preferred term is used consistently:
 
-   | Preferred Term   | Notes                                     |
-   |------------------|-------------------------------------------|
-   | dataset          | Not "data set" or "database"              |
-   | meta-information | Not "metadata" or "meta-data"             |
-   | variable-size    | Not "variable-length" or "variable-sized" |
+   | Preferred Term   | Notes                                                                    |
+   |------------------|--------------------------------------------------------------------------|
+   | dataset          | Not "data set" or "database"                                             |
+   | meta-information | Not "metadata" or "meta-data"                                            |
+   | variable-size    | Not "variable-length" or "variable-sized"                                |
+   | variable/column  | Both terms are used interchangeably, but "field" has a different meaning |
 
 4. Table column headers are capitalized.
 

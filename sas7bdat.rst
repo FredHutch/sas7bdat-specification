@@ -1148,7 +1148,7 @@ Columns with formatting information have special meaning and interpretation.
 For example, a timestamp is a numeric variable and is stored as the number of seconds since midnight, January 1, 1960.
 The format string for a timestamp variable is "DATETIME", which is what tells SAS to display the number as a timestamp instead of a raw number.
 Using R, these values may be converted using the as.POSIXct or as.POSIXlt functions with argument ``origin="1960-01-01"``.
-The most common date format strings correspond to numeric fields, and are interpreted as follows:
+The most common date format strings correspond to numeric variables, and are interpreted as follows:
 
 .. class:: date-time-format-table
 
@@ -1162,7 +1162,7 @@ DATETIME  Number of seconds since midnight on January 1, 1960   as.POSIXct
 
 The time zone is *not* stored within a SAS7BAT.
 
-There are many additional format strings for numeric and character fields.
+There are many additional format strings for numeric and character variables.
 
 Deleted Row Flags
 -----------------
