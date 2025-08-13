@@ -514,7 +514,7 @@ This may be used to indicate the end of the subheader pointers array.
 ======= ============
 0       Uncompressed
 1       Truncated (ignore data)
-4       A row of data in a compressed dataset (see `compressed binary data subheader`)
+4       A row of data in a compressed dataset (see `compressed binary data subheader`_)
 ======= ============
 
 In an uncompressed file, the subheaders with ST=0 have fixed size and the subheaders with ST=1 have a variable size.
