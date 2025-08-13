@@ -443,7 +443,7 @@ There are at least five page types, shown below:
 .. class:: page-type-table
 
 ======  ====    ==========  ======================  ===================================
-PGTYPE  name    subheaders  uncompressed row data   compressed row data
+PGTYPE  Name    Subheaders  Uncompressed Row Data   Compressed Row Data
                             (after subheaders)      (in subheaders)
 ======  ====    ==========  ======================  ===================================
 0       meta    yes (SC>0)  no  (BC=SC)             yes
