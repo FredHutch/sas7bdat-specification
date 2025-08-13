@@ -381,17 +381,20 @@ SAS7BDAT Pages
 ==============
 
 Following the SAS7BDAT header are pages of meta-information and data.
-Each page can be one of (at least) four types.
-The first three are those that contain meta-information (e.g. field/column attributes), packed binary data, or a combination of both.
+Each page can be one of (at least) five types.
+The three most common types contain meta-information (for example, column attributes), packed binary data, or a combination of both.
 These types are denoted 'meta', 'data', and 'mix' respectively.
 Meta-information is required to correctly interpret the packed binary information.
 Hence, this information must be parsed first.
-A 'meta' page contains only meta-information and compressed data
+A 'meta' page contains only meta-information and compressed data.
 A 'mix' page contains both meta-information and uncompressed data.
 A 'data' page contains only uncompressed data.
-In test files, the pages are ordered as zero or more 'meta' pages, followed by a 'mix' page, followed by zero or more 'data' pages.
-In some test data files, there is a fourth page type, denoted 'amd'.
-This page usually occurs last, and appears to contain amended meta-information.
+
+For uncompressed files, the pages are ordered as zero or more 'meta' pages, followed by a 'mix' page, followed by zero or more 'data' pages.
+
+One uncompressed test data file has a fourth page type, denoted 'amd', which appears last.
+
+For compressed files, the first page is a 'meta' page (which contains meta-information and compressed data), optionally followed by a 'comp' page, followed by zero or more 'meta' pages.
 
 Conceptually, all pages have the same structure and some parts are optional::
 
@@ -435,6 +438,8 @@ B               % PL_           medium  subheader data, deleted flags, and/or un
 Page Type
 +++++++++
 
+There are at least five page types, shown below:
+
 .. class:: page-type-table
 
 ======  ====    ==========  ======================  ===================================
@@ -449,9 +454,8 @@ PGTYPE  name    subheaders  uncompressed row data   compressed row data
 -28672  comp    no          no                      no
 ======  ====    ==========  ======================  ===================================
 
-There are at least four page types 'meta', 'data', 'mix', and 'amd'.
-These types are encoded in the most significant byte of a two-byte field at page offset 16|32.
-If no bit is set, the following page is of type 'meta'.
+The page type is encoded in the most significant byte of a two-byte field at page offset 16|32.
+If no bit is set, the page is of type 'meta'.
 If the first, second, or third bits are set, then the page is of type 'data', 'mix', or 'amd', respectively.
 Hence, if the two bytes are interpreted as an unsigned integer, then the 'meta', 'data', 'mix', and 'amd' types correspond to 0, 256, 512, and 1024, respectively.
 In compressed files, other bits (and sometimes multiple bits) have been set (e.g., ``1 << 16 | 1 << 13``, which is ``-28672`` signed, or ``36864`` unsigned).
@@ -474,6 +478,11 @@ It contains some initial data and 2 tables.
 The first table has many rows of length 24; its purpose is unknown.
 The second table has one entry per data page with the page number and the number of data rows on the page for SC pages.
 It could be used to access a particular row without reading all preceding data pages.
+
+The `passngrs.sas7bdat.txt` test file has an 'amd' page as the final page.
+The 'amd' page contains additional label and format meta-information for a variable.
+It may have been created by a SAS program that modified a variable of an existing SAS7BDAT file.
+Hence the name 'amd', which is short for 'amendment'.
 
 Subheader Pointers
 ++++++++++++++++++
@@ -1233,9 +1242,6 @@ ToDo
   Do the non-u64 files handle this, with additional fields beyond the 4 byte TRC used for segmentation?  Is TRC a (signed) int or (unsigned) uint?
 - experiment further with 'amendment page' concept
 - consider header bytes -by- SAS_host
-- check that only one page of type "mix" is observed.
-  If so insert "In all test cases (``data/sources.csv``), there are exactly zero or one pages of type 'mix'." under the `Page Offset Table`_ header.
-  [May not be needed, because the BC and SC fields in each Page Offset Table make the `MRC`_ field in the initial header unnecessary.]
 - identify purpose of various unknown header quantities
 - determine purpose of Column List subheader
 - determine pattern of the 'page sequence number' fields.
