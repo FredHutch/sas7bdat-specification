@@ -21,7 +21,7 @@ To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/
 
 Further contributions in 2025 by David Costanzo from Fred Hutch Cancer Center.
 
-Document Version: 1.0
+Document Version: 1.0+
 
 Contents
 ========
@@ -334,48 +334,46 @@ Page Sequence Number
 
 Following the header, the content of a SAS7BDAT file is chunked into pages of a constant size (PL_ bytes).
 Each of these pages has a unique four-byte integer, which acts as a page sequence number.
-Instead of starting at page 1 and incrementing from there, the page sequence numbers start at a seemingly random number and then "increment" in a well-defined but haphazard manner.
-The exact way in which they increment is unknown.
+Instead of starting at page 1 and incrementing from there, the page sequence numbers start at a seemingly random number and then "increment" in a well-defined, nonlinear manner.
 
-For example, if the initial page sequence number is xE2677F63, then it increments by going down by 1 four times, then up by 7 once (e.g., x63,x62,x61,x60, x67,x66,x65,x64, x6B,x6A,x69,x68, x6F,...).
-If the initial page sequence number is xAB353E75, it increments by going up by 1 four times, then down by 7 % 16 (e.g., x75,x76,x77, x70,x71,x72,x73, x7C,x7D,x7E,x7F, x78,...).
-For an initial sequence number of x3664FB5A, the value increments by going up by 1, then down by 4 (e.g., x5A,x5B, x58,x59, x5E,x5F, x5C,x5D, x52,x53, x50,x51, x56,x57, x54,x55, ...).
+The nonlinear incrementing function is applied to each four-bit range in the four-byte sequence number.
+Starting with the lowest four bits, the incrementing function depends only on the initial value of the lowest four bits.
+Once the lowest four-bit range has been incremented 16 times, the lowest four bits are reset to their initial values and the second four-bit range is incremented by the same function, using the second four-bit value's initial value.
+Incrementing then continues on the lowest four-bit range.
+When the second lowest four-bit value has been incremented 16 times, its value is reset and the third lowest four-bit value is incremented.
+This pattern may continue for all four-bit ranges, but since 12 bits covers datasets with up to 4096 pages, increments in the higher ranges haven't been observed.
+
+The incrementing function can be given as a table, with the initial value defining how the value is incremented.
+The table is grouped into subsequences of four to illustrate a pattern of the increment function.
+The pattern suggests that there's a simpler way to express the increment function, perhaps phrasing it as increments on 2-bit values instead of four-bit values.
+
+=============   =========== =========== =========== ===========
+Initial Value   0 - 3       4 - 7       8 - 11      12 - 15
+=============   =========== =========== =========== ===========
+x0              x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 xA xB xC xD xE xF
+x1              x1 x0 x3 x2 x5 x4 x7 x6 x9 x8 xB xA xD xC xF xE
+x2              x2 x3 x0 x1 x6 x7 x4 x5 xA xB x8 x9 xE xF xC xD
+x3              x3 x2 x1 x0 x7 x6 x5 x4 xA xB x9 x8 xF xE xD xC
+x4              x4 x5 x6 x7 x0 x1 x2 x3 xC xD xE xF x8 x9 xA xB
+x5              x5 x4 x7 x6 x1 x0 x3 x2 xD xC xF xE x9 x8 xB xA
+x6              x6 x7 x4 x5 x2 x3 x0 x1 xE xF xC xD xA xB x8 x9
+x7              x7 x6 x5 x4 x3 x2 x1 x0 xF xE xD xC xB xA x9 x8
+x8              x8 x9 xA xB xC xD xE xF x0 x1 x2 x3 x4 x5 x6 x7
+x9              x9 x8 xB xA xD xC xF xE x1 x0 x3 x2 x5 x4 x7 x6
+xA              xA xB x8 x9 xE xF xC xD x2 x3 x0 x1 x6 x7 x4 x5
+xB              xB xA x9 x8 xF xE xD xC x3 x2 x1 x0 x7 x6 x5 x4
+xC              xC xD xE xF x8 x9 xA xB x4 x5 x6 x7 x0 x1 x2 x3
+xD              xD xC xF xE x9 x8 xB xA x5 x4 x7 x6 x1 x0 x3 x2
+xE              xE xF xC xD xA xB x8 x9 x6 x7 x4 x5 x2 x3 x0 x1
+xF              xF xE xD xC xB xA x9 x8 x7 x6 x5 x4 x3 x2 x1 x0
+=============   =========== =========== =========== ===========
+
+For example, if the initial page sequence number is x2A, then the sequence increments as x2B, x28, x29, x3A, x3B, x38, x39, x0A, xAB, and so on.
 
 When reading a SAS7BDAT file, the page sequence numbers may be ignored.
 When writing a SAS7BDAT file, a known sequence can used.
 
-A relatively simple page sequence is one that starts with xF4A4FFF6.
-It increments the low four bits with the pattern x6,x7, x4,x5, x2,x3, x0,x1, xE,xF, xC,xD xA,xB, x8,x9.
-To go higher than x9, the low four bits restart at x6 and the rest of the number (xFFA4FF??) decrements by 1.
-
-For example::
-
-  xF4A4FFF6 - initial
-  xF4A4FFF7 - page 1
-  xF4A4FFF4 - page 2
-  xF4A4FFF5 - page 3
-  xF4A4FFF2 - page 4
-  xF4A4FFF3 - page 5
-  xF4A4FFF0 - page 6
-  xF4A4FFF1 - page 7
-  xF4A4FFFE - page 8
-  xF4A4FFFF - page 9
-  xF4A4FFFC - page 10
-  xF4A4FFFD - page 11
-  xF4A4FFFA - page 12
-  xF4A4FFFB - page 13
-  xF4A4FFF8 - page 14
-  xF4A4FFF9 - page 15
-
-  xF4A4FFE6 - page 16
-  xF4A4FFE7 - page 17
-  ...
-  xF4A4FF08 - page 254
-  xF4A4FF09 - page 255
-  xF4A4FEF6 - page 256
-  xF4A4FEF7 - page 257
-  ...
-
+The simplest page sequence starts with 0 and increments as a normal 32-bit number.
 
 SAS7BDAT Pages
 ==============
@@ -1244,5 +1242,4 @@ ToDo
 - consider header bytes -by- SAS_host
 - identify purpose of various unknown header quantities
 - determine purpose of Column List subheader
-- determine pattern of the 'page sequence number' fields.
 - determine the purpose of the first four bytes in the text array of the first `Column Text subheader`_.
