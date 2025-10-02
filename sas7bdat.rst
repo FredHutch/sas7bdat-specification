@@ -159,7 +159,7 @@ Offset          Length  Conf.   Description
 272+a1+a2       16      high    ascii, OS name (for UNIX, else spaces or 0 bytes)
 288+a1+a2       16      low     *????????????*, may be related to encryption.  For unencrypted files, the first four bytes are the low four bytes of the creation date, followed by a different four byte value that is repeated three times.  The first four bytes may be a nonce.  The repeated portion may be a function of the nonce and the password.  In an unencrypted file, the first four bytes were once observed to ``x38 xC0 xC8 xD4``.  In that same file, the repeated portion was observed to be ``x74 x8E xA7 xB1``, repeated three times.
 304+a1+a2       16      low     *????????????*, observed all zero bytes.
-320+a1+a2       4       high    int, the initial `Page Sequence Number`_
+320+a1+a2       4       high    int, the initial value in the `Page Number Sequence`_
 324+a1+a2       4       low     *????????????*
 328+a1+a2       8       medium  double, 3rd timestamp, sometimes zero
 336+a1+a2       %HL     medium  zeros
@@ -329,15 +329,15 @@ Encoding Byte   SAS Name        iconv Name
 
 When the encoding is unspecified, the file uses the encoding of the SAS session that produced it (usually Windows-1252).
 
-Page Sequence Number
+Page Number Sequence
 ++++++++++++++++++++
 
 Following the header, the content of a SAS7BDAT file is chunked into pages of a constant size (PL_ bytes).
-Each of these pages has a unique four-byte integer, which acts as a page sequence number.
-Instead of starting at page 1 and incrementing from there, the page sequence numbers start at a seemingly random number and then "increment" in a well-defined, nonlinear manner.
+Each of these pages has a unique four-byte integer, which acts as a page number.
+Instead of starting at page 1 and incrementing from there, the page number sequence start at a seemingly random number and then "increments" in a well-defined, nonlinear manner.
 
 The sequence is simply the bitwise exclusive or (XOR) of the first value in the sequence with the zero-based index of the page.
-For example, if the page sequence starts with x2A, then the sequence increments as x2A, x2B, x28, x29, x3A, x3B, x38, x39, x0A, xAB, and so on.
+For example, if the page sequence starts with x2A, then the sequence is (x2A, x2B, x28, x29, x3A, x3B, x38, x39, x0A, xAB, ...).
 This is because x2A XOR 0 = x2A, x2A XOR 1 = x2B, x2A XOR 2 = x28, and so on.
 
 The simplest page sequence starts with 0 and increments as a normal 32-bit number.
@@ -387,7 +387,7 @@ Page Offset Table
 ==============  ==============  ======  ===============================================
 Offset          Length          Conf.   Description
 ==============  ==============  ======  ===============================================
-0               4               high    int, next `Page Sequence Number`_
+0               4               high    int, next value from the `Page Number Sequence`_
 4               8|20            low     *????????????*
 12|24           4|8             low     number of unused bytes on page
 16|32           2               medium  int, bit field `page type`_ := PGTYPE
@@ -581,7 +581,7 @@ Offset      Length      Conf.   Description
 60|120      4|8         medium  int, max possible row count on "mix" page := _`MRC`.  This may be larger than the actual number of rows on the mix page.
 64|128      8|16        medium  sequence of 8|16 xFF, end of initial header
 72|144      148|296     medium  zeroes
-220|440     4           low     int, initial `Page Sequence Number`_ (equals value at offset 0 of first page)
+220|440     4           low     int, initial value in the `Page Number Sequence`_ (the value at offset 0 of first page)
 224|444     28|44       low     zeroes
 ???|488     ?|8         high    int, number of times the dataset has processed with a PROC DATASETS REPAIR statement.
 ???|496     8           high    double, timestamp, seconds since 1960-01-01T00:00:00 UTC when the dataset was most recently processed with a PROC DATASETS REPAIR statement; zero if never.
