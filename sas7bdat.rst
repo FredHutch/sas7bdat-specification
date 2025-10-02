@@ -336,42 +336,9 @@ Following the header, the content of a SAS7BDAT file is chunked into pages of a 
 Each of these pages has a unique four-byte integer, which acts as a page sequence number.
 Instead of starting at page 1 and incrementing from there, the page sequence numbers start at a seemingly random number and then "increment" in a well-defined, nonlinear manner.
 
-The nonlinear incrementing function is applied to each four-bit range in the four-byte sequence number.
-Starting with the lowest four bits, the incrementing function depends only on the initial value of the lowest four bits.
-Once the lowest four-bit range has been incremented 16 times, the lowest four bits are reset to their initial values and the second four-bit range is incremented by the same function, using the second four-bit value's initial value.
-Incrementing then continues on the lowest four-bit range.
-When the second lowest four-bit value has been incremented 16 times, its value is reset and the third lowest four-bit value is incremented.
-This pattern may continue for all four-bit ranges, but since 12 bits covers datasets with up to 4096 pages, increments in the higher ranges haven't been observed.
-
-The incrementing function can be given as a table, with the initial value defining how the value is incremented.
-The table is grouped into subsequences of four to illustrate a pattern of the increment function.
-The pattern suggests that there's a simpler way to express the increment function, perhaps phrasing it as increments on 2-bit values instead of four-bit values.
-
-=============   =========== =========== =========== ===========
-Initial Value   0 - 3       4 - 7       8 - 11      12 - 15
-=============   =========== =========== =========== ===========
-x0              x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 xA xB xC xD xE xF
-x1              x1 x0 x3 x2 x5 x4 x7 x6 x9 x8 xB xA xD xC xF xE
-x2              x2 x3 x0 x1 x6 x7 x4 x5 xA xB x8 x9 xE xF xC xD
-x3              x3 x2 x1 x0 x7 x6 x5 x4 xA xB x9 x8 xF xE xD xC
-x4              x4 x5 x6 x7 x0 x1 x2 x3 xC xD xE xF x8 x9 xA xB
-x5              x5 x4 x7 x6 x1 x0 x3 x2 xD xC xF xE x9 x8 xB xA
-x6              x6 x7 x4 x5 x2 x3 x0 x1 xE xF xC xD xA xB x8 x9
-x7              x7 x6 x5 x4 x3 x2 x1 x0 xF xE xD xC xB xA x9 x8
-x8              x8 x9 xA xB xC xD xE xF x0 x1 x2 x3 x4 x5 x6 x7
-x9              x9 x8 xB xA xD xC xF xE x1 x0 x3 x2 x5 x4 x7 x6
-xA              xA xB x8 x9 xE xF xC xD x2 x3 x0 x1 x6 x7 x4 x5
-xB              xB xA x9 x8 xF xE xD xC x3 x2 x1 x0 x7 x6 x5 x4
-xC              xC xD xE xF x8 x9 xA xB x4 x5 x6 x7 x0 x1 x2 x3
-xD              xD xC xF xE x9 x8 xB xA x5 x4 x7 x6 x1 x0 x3 x2
-xE              xE xF xC xD xA xB x8 x9 x6 x7 x4 x5 x2 x3 x0 x1
-xF              xF xE xD xC xB xA x9 x8 x7 x6 x5 x4 x3 x2 x1 x0
-=============   =========== =========== =========== ===========
-
-For example, if the initial page sequence number is x2A, then the sequence increments as x2B, x28, x29, x3A, x3B, x38, x39, x0A, xAB, and so on.
-
-When reading a SAS7BDAT file, the page sequence numbers may be ignored.
-When writing a SAS7BDAT file, a known sequence can used.
+The sequence is simply the bitwise exclusive or (XOR) of the first value in the sequence with the zero-based index of the page.
+For example, if the page sequence starts with x2A, then the sequence increments as x2A, x2B, x28, x29, x3A, x3B, x38, x39, x0A, xAB, and so on.
+This is because x2A XOR 0 = x2A, x2A XOR 1 = x2B, x2A XOR 2 = x28, and so on.
 
 The simplest page sequence starts with 0 and increments as a normal 32-bit number.
 
