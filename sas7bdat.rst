@@ -21,7 +21,7 @@ To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/
 
 Further contributions in 2025 by David Costanzo from Fred Hutch Cancer Center.
 
-Document Version: 1.0+
+Document Version: 1.1
 
 Contents
 ========
