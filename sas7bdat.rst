@@ -159,7 +159,7 @@ Offset          Length  Conf.   Description
 272+a1+a2       16      high    ascii, OS name (for UNIX, else spaces or 0 bytes)
 288+a1+a2       16      low     *????????????*, may be related to encryption.  For unencrypted files, the first four bytes are the low four bytes of the creation date, followed by a different four byte value that is repeated three times.  The first four bytes may be a nonce.  The repeated portion may be a function of the nonce and the password.  In an unencrypted file, the first four bytes were once observed to ``x38 xC0 xC8 xD4``.  In that same file, the repeated portion was observed to be ``x74 x8E xA7 xB1``, repeated three times.
 304+a1+a2       16      low     *????????????*, observed all zero bytes.
-320+a1+a2       4       high    int, the initial value in the `Page Number Sequence`_
+320+a1+a2       4       high    int, the bitmask for the `Page Number Sequence`_ := PN_MASK
 324+a1+a2       4       low     *????????????*
 328+a1+a2       8       medium  double, 3rd timestamp, sometimes zero
 336+a1+a2       %HL     medium  zeros
@@ -334,13 +334,38 @@ Page Number Sequence
 
 Following the header, the content of a SAS7BDAT file is chunked into pages of a constant size (PL_ bytes).
 Each of these pages has a unique four-byte integer, which acts as a page number.
-Instead of starting at page 1 and incrementing from there, the page number sequence start at a seemingly random number and then "increments" in a well-defined, nonlinear manner.
+Instead of starting at 1 and incrementing by one for each new page, the page number sequence starts at a seemingly random number and then "increments" in a well-defined, nonlinear manner.
 
-The sequence is simply the bitwise exclusive or (XOR) of the first value in the sequence with the zero-based index of the page.
-For example, if the page sequence starts with x2A, then the sequence is (x2A, x2B, x28, x29, x3A, x3B, x38, x39, x0A, xAB, ...).
-This is because x2A XOR 0 = x2A, x2A XOR 1 = x2B, x2A XOR 2 = x28, and so on.
+The page number sequence can be calculated by computing the bitwise exclusive or (XOR) of PN_MASK and each number in the sequence (1, 2, 3, 4, ...).
+The PN_MASK is given in the `SAS7BDAT Header`_.
 
-The simplest page sequence starts with 0 and increments as a normal 32-bit number.
+For example, if PN_MASK is 0x2A, then the first eighteen numbers in the page number sequence can be calculated as shown in the following table:
+
+=========== ======================= ======================
+Page Index  Page Number In SAS7BDAT Calculation
+=========== ======================= ======================
+1           x2B                     XOR(x2A, 1)
+2           x28                     XOR(x2A, 2)
+3           x29                     XOR(x2A, 3)
+4           x2E                     XOR(x2A, 4)
+5           x2F                     XOR(x2A, 5)
+6           x2C                     XOR(x2A, 6)
+7           x2D                     XOR(x2A, 7)
+8           x22                     XOR(x2A, 8)
+9           x23                     XOR(x2A, 9)
+10          x20                     XOR(x2A, 10)
+11          x21                     XOR(x2A, 11)
+12          x26                     XOR(x2A, 12)
+13          x27                     XOR(x2A, 13)
+14          x24                     XOR(x2A, 14)
+15          x25                     XOR(x2A, 15)
+16          x3A                     XOR(x2A, 16)
+17          x3B                     XOR(x2A, 17)
+18          x39                     XOR(x2A, 18)
+=========== ======================= ======================
+
+The simplest page number sequence has PN_MASK = 0.
+The corresponding sequence starts with 1 and increments as a normal 32-bit number.
 
 SAS7BDAT Pages
 ==============
