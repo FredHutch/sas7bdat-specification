@@ -1,3 +1,5 @@
+**THIS REPOSITORY IS NOW ARCHIVED. PLEASE SEE FORKS FOR LATEST SAS7BDAT SPECIFICATION.**
+
 This package contains documents and software related to a compatibility study of the SAS7BDAT database file format. The 'data/sas7bdat.sources.RData' references a collection of SAS7BDAT database files freely avalilable from internet resources. The data are not redistributed due to licensing concerns. Files in the collection are used for testing and investigating the SAS7BDAT file format. 
  
 The included vignette documents various aspects of the compatibility study, including a detailed description of the binary structure of SAS7BDAT formatted databases. 
