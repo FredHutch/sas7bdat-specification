@@ -19,9 +19,9 @@ Copyright (C) 2013 is retained by the authors listed above.
 This work is licensed under the Creative Commons Attribution-ShareAlike 3.0 Unported License.
 To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/3.0/.
 
-Further contributions in 2025 by David Costanzo from Fred Hutch Cancer Center.
+Further contributions in 2025-2026 by David Costanzo from Fred Hutchinson Cancer Center.
 
-Document Version: 1.1
+Document Version: 1.2
 
 Contents
 ========
@@ -518,7 +518,7 @@ Furthermore, the data is stored as a subheaders.
 ST      Subheaders
 ====    ============
 0       Row Size, Column Size, Subheader Counts, Column Format and Label, in Uncompressed file
-1       Column Text, Column Names, Column Attributes, Column List
+1       Column Text, Column Names, Column Attributes, Column Hash Table
 1       all subheaders (including row data), in Compressed file.
 ====    ============
 
@@ -533,7 +533,7 @@ Some subheaders types may appear more than once.
 For example, the `Column Format subheader` is repeated once per variable.
 When a subheader type appears more than once, all subheaders of that type are adjacent.
 
-The Column Text, Column Name, Column Attributes, and Column List subheader types have a variable size.
+The Column Text, Column Name, Column Attributes, and Column Hash Table subheader types have a variable size.
 
 All variable-size subheaders have a 2 byte "_`subheader payload size`" field at offset 4|8, just after the subheader signature.
 The subheader payload size is the number of bytes in the subheader without including the 4|8 byte signature or 8|12 bytes of padding at the end.
@@ -554,7 +554,7 @@ The subheader types are ordered as follows within the `Subheader Pointers`_ tabl
 4. `Column Text subheader`_
 5. `Column Name subheader`_
 6. `Column Attributes subheader`_
-7. `Column List subheader`_
+7. `Column Hash Table subheader`_
 8. `Column Format and Label subheader`_
 
 The subheaders cross-reference each other in two structured ways: with a "subheader location" and a "text reference".
@@ -599,7 +599,7 @@ Offset      Length      Conf.   Description
 32|64       4|8         low     *????????????*; x00 has been observed on **u64**
 36|72       4|8         medium  int, number of `Column Format and Label Subheader`_ on first page where they appear := _`NCFL1`
 40|80       4|8         medium  int, number of `Column Format and Label Subheader`_ on second page where they appear (or 0) := _`NCFL2`
-44|88       4|8         medium  Sum of the size of the payload of all `Column List Subheader`_ (subheader size - 28)
+44|88       4|8         medium  Sum of the size of the payload of all `Column Hash Table Subheader`_ (subheader size - 28)
 48|96       4|8         medium  Sum of the length of all variable names
 52|104      4|8         medium  int, page size, equals PL
 56|112      4|8         low     *????????????*; x00 has been observed on **u64**
@@ -713,7 +713,7 @@ Subheader Signature Subheader Type
 -4                  Column Attributes
 -3                  Column Text
 -1                  Column Name
--2                  Column List
+-2                  Column Hash Table
 -5                  *unknown signature #1*
 -6                  *unknown signature #2*
 -7                  *unknown signature #3*
@@ -884,15 +884,31 @@ Offset  Length  Conf.   Description
 52|64           medium  Total length of subheader, QL
 =======	=======	======	===============================================
 
-Column List Subheader
----------------------
+Column Hash Table Subheader
+---------------------------
 
-The purpose of this subheader type is not clear, but the structure is partly identified.
-Information related to this subheader was contributed by Clint Cummins.
+The Column Hash Table subheader is a data structure for looking up a column number by its name.
+
+Specifically, this is an open addressing hash table that maps the column name to a column number.
+In the event of a hash collision or a probe collision, the negation of the column number is placed in the bucket instead of the column number.
+Unused buckets in the hash table are set to 0.
+
+The size of the hash table is a smallest prime number that is greater than or equal to the number of columns in the dataset, multiplied by 1.3, then truncated to an integer.
+This gives a load factor of approximately 0.77.
+
+To compute the hash code of a variable name, first map the variable name to upper case.
+Next, pad it with 0 bytes until it has a length (in bytes) that is a multiple of 4.
+Finally, XOR the bytes in that buffer, treating it as an array of 32-bit little-endian integers.
+
+The probe interval is the hash code divided by the size of the hash table (truncated), modulo the hash table size.
+A probe interval of 0 is treated as if it were 1.
 
 Files created by Stat/Transfer do not have this subheader.
+Presumably, SAS can create its own lookup data structure when this subheader is absent.
 
-This subheader is not present in datasets which have only one column.
+This subheader is absent in datasets which have only one column, in which case finding a column number by its name is trivial.
+
+Information related to this subheader was contributed by Clint Cummins.
 
 .. class:: offset-table
 
@@ -900,33 +916,28 @@ This subheader is not present in datasets which have only one column.
 Offset  Length  Conf.   Description
 ======= ======  ======  ===============================================
 0       4|8     high    int, signature -2 (xFEFFFFFF|xFEFFFFFFFFFFFFFF)
-4|8     2       medium  `subheader payload size`_ (CL * 2 + MCL - 4|8)
+4|8     2       medium  `subheader payload size`_ (TABLE_SIZE * 2 + MCL - 4|8)
 6|10    6       low     *????????????*
 12|16   4|8     medium  int, length of remaining subheader
-16|24   2       low     int, usually equals NCOL
-18|26   2       medium  int, length of column list := CL, usually CL > NCOL
+16|24   2       medium  int, usually equals NCOL
+18|26   2       high    int, size of hash table := TABLE_SIZE
 20|28   2       low     int, usually 1
 22|30   2       low     int, usually equals NCOL
-24|32   2       low     int, usually 3 equal values
-26|34   2       low     int, usually 3 equal values
-28|36   2       low     int, usually 3 equal values
-30|38   2*CL    medium  `column list values`_ (see below)
-MCL     8       low     usually zeros, 30|38 + 2*CL := MCL
+24|32   2       low     int, possibly uninitialized memory
+26|34   2       low     int, possibly uninitialized memory
+28|36   2       low     int, possibly uninitialized memory
+30|38   2*CL    medium  `column hash table values`_ (see below)
+MCL     8       low     usually zeros, 30|38 + 2*TABLE_SIZE := MCL
 ======= ======  ======  ===============================================
 
-Column List Values
-++++++++++++++++++
+Column Hash Table Values
+++++++++++++++++++++++++
 
-These values are 2 byte integers, with (CL-NCOL) zero values.
+These values are 2 byte integers, with (TABLE_SIZE-NCOL) zero values.
 All numbers from 1 to NCOL are present exactly once in this list, given as either positive or negative.
-There are never more zero values than non-zero values.
-The significance of signedness and ordering is unknown.
-The values do not correspond to a sorting order of columns.
+A negative value indicates that a hash or probe collision happened in this bucket.
+The zero values are empty buckets in the hash table.
 
-CL is a function purely of NCOL.
-The function never decreases as NCOL increases.
-
-The sign and order of the values appears to be related to the column names.
 
 Compressed Binary Data Subheader
 --------------------------------
@@ -1233,5 +1244,4 @@ ToDo
 - experiment further with 'amendment page' concept
 - consider header bytes -by- SAS_host
 - identify purpose of various unknown header quantities
-- determine purpose of Column List subheader
 - determine the purpose of the first four bytes in the text array of the first `Column Text subheader`_.
