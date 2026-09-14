@@ -541,10 +541,8 @@ Therefore, it is always 12|20 bytes smaller than QL, the subheader size given in
 
 Every variable-size subheader type may appear one or more times.
 They appear more than once if their total content would not fit in the space remaining on the page or within the maximum subheader size of 32767 bytes.
-
-The variable-size subheader types provide information about specific columns.
-When a subheader type appears more than once, each one provides information for an exclusive subset of columns.
-The order in which data is read from multiple subheaders corresponds to the reading order (left to right) of columns.
+When a subheader type appears more than once, the first 12|16 bytes are repeated, but the rest of the subheader payload continues from where the previous subheader left off.
+The 8|12 bytes of padding at the end is also repeated.
 
 The subheader types are ordered as follows within the `Subheader Pointers`_ table.
 
@@ -916,25 +914,36 @@ Information related to this subheader was contributed by Clint Cummins.
 Offset  Length  Conf.   Description
 ======= ======  ======  ===============================================
 0       4|8     high    int, signature -2 (xFEFFFFFF|xFEFFFFFFFFFFFFFF)
-4|8     2       medium  `subheader payload size`_ (TABLE_SIZE * 2 + MCL - 4|8)
+4|8     2       medium  `subheader payload size`_ (QL - 12|20)
 6|10    6       low     *????????????*
 12|16   4|8     medium  int, length of remaining subheader
 16|24   2       medium  int, usually equals NCOL
-18|26   2       high    int, size of hash table := TABLE_SIZE
+18|26   2       high    int, number of entries in hash table := TABLE_SIZE
 20|28   2       low     int, usually 1
 22|30   2       low     int, usually equals NCOL
 24|32   2       low     int, possibly uninitialized memory
 26|34   2       low     int, possibly uninitialized memory
 28|36   2       low     int, possibly uninitialized memory
-30|38   2*CL    medium  `column hash table values`_ (see below)
-MCL     8       low     usually zeros, 30|38 + 2*TABLE_SIZE := MCL
+30|38   2*HTL   medium  `column hash table values`_ (see below)
+MHTL    8|12    low     usually zeros, subheader payload size + 4|8 := MHTL
 ======= ======  ======  ===============================================
+
+When multiple column hash table subheaders appear in a dataset, only the first subheader contains the fields from offset 12|16 to offset 30|38.
+The rest of the subheaders contains everything up to offset 12|16, which includes the signature, the subheader payload size, and the 6 bytes of padding.
+At offset 12|16, they continue with the hash table buckets from where the previous subheader left off.
+All column hash table subheaders also include the 8|12 bytes of padding at the end.
 
 Column Hash Table Values
 ++++++++++++++++++++++++
 
-These values are 2 byte integers, with (TABLE_SIZE-NCOL) zero values.
-All numbers from 1 to NCOL are present exactly once in this list, given as either positive or negative.
+The subheader payload size field excludes the signature and the 8|12 bytes of padding at the end.
+Each hash table bucket occupies two bytes.
+Therefore, the number of hash table buckets HTL within the first subheader is calculated as (subheader payload size - 26|30) / 2.
+The number of hash table buckets of the remaining subheaders is (subheader payload size - 8) / 2.
+
+These values are 2 byte integers.
+Across all Column Hash Table subheaders, there are (TABLE_SIZE-NCOL) zero values.
+Across all Column Hash Table subheaders, all numbers from 1 to NCOL are present exactly once, given as either positive or negative.
 A negative value indicates that a hash or probe collision happened in this bucket.
 The zero values are empty buckets in the hash table.
 
