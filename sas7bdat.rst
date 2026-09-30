@@ -896,8 +896,8 @@ This gives a load factor of approximately 0.77.
 
 To compute the hash code of a variable name, first map the variable name to upper case.
 Next, determine how the name is represented as an array of bytes in the dataset's character encoding.
-Pad the array of bytes with 0 bytes until it has a length (in bytes) that is a multiple of 4.
-Finally, XOR the bytes in that buffer, treating it as an array of unsigned 32-bit little-endian integers.
+Append zeros to the end of the array until it has a length (in bytes) that is a multiple of 4.
+Finally, treating the array as an array of unsigned 32-bit little-endian integers, XOR all of the integers together.
 
 The probe interval is the hash code divided by the size of the hash table (truncated), modulo the hash table size.
 A probe interval of 0 is treated as if it were 1.
